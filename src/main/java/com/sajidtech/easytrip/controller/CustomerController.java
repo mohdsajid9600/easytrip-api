@@ -1,5 +1,6 @@
 package com.sajidtech.easytrip.controller;
 
+import com.sajidtech.easytrip.Enum.Gender;
 import com.sajidtech.easytrip.dto.request.CustomerRequest;
 import com.sajidtech.easytrip.dto.response.CustomerResponse;
 import com.sajidtech.easytrip.model.Customer;
@@ -8,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.util.List;
 
 @RestController
 @RequestMapping("/customer")
@@ -31,4 +33,16 @@ public class CustomerController {
         return ResponseEntity.status(HttpStatus.FOUND).body(customerResponse);
     }
 
+    @GetMapping("/getBy-gender-age")
+    public ResponseEntity<List<CustomerResponse>> getAllByGenderAndAge(@RequestParam("gender") Gender gender,
+                                                       @RequestParam("age") int age){
+        List<CustomerResponse> responses = customerService.getAllByGenderAndAge(gender, age);
+        return ResponseEntity.status(HttpStatus.FOUND).body(responses);
+    }
+
+    @GetMapping("/getAll-greaterThen/{age}")
+    public ResponseEntity<List<CustomerResponse>> getAllGreaterThenAge(@PathVariable("age") int age){
+        List<CustomerResponse> responses = customerService.getAllGreaterThenAge(age);
+        return ResponseEntity.status(HttpStatus.OK).body(responses);
+    }
 }
