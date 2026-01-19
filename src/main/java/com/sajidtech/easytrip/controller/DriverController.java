@@ -21,7 +21,7 @@ public class DriverController {
         return ResponseEntity.status(HttpStatus.CREATED).body(driverResponse);
     }
 
-    @GetMapping("get-driver/{id}")
+    @GetMapping("/get-driver/{id}")
     public ResponseEntity<DriverResponse> getDriverById(@PathVariable("id") int id){
         DriverResponse driverResponse = driverService.getDriverById(id);
         return new ResponseEntity<>(driverResponse, HttpStatus.FOUND);

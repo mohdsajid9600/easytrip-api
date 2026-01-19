@@ -27,9 +27,9 @@ public class CustomerController {
         }
         return ResponseEntity.status(HttpStatus.CREATED).body(customerResponse);
     }
-    @GetMapping("get-customer/{id}")
-    public ResponseEntity<CustomerResponse> getCustomerById(@PathVariable("id") int id){
-        CustomerResponse customerResponse = customerService.getCustomerById(id);
+    @GetMapping("/get-customer/{id}")
+    public ResponseEntity<CustomerResponse> getCustomerById(@PathVariable("id") int customerId){
+        CustomerResponse customerResponse = customerService.getCustomerById(customerId);
         return ResponseEntity.status(HttpStatus.FOUND).body(customerResponse);
     }
 

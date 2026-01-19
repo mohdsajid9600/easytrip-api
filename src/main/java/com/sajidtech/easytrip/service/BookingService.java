@@ -1,6 +1,7 @@
 package com.sajidtech.easytrip.service;
 
 
+import com.sajidtech.easytrip.Enum.TripStatus;
 import com.sajidtech.easytrip.dto.request.BookingRequest;
 import com.sajidtech.easytrip.dto.response.BookingResponse;
 import com.sajidtech.easytrip.emailTemplate.EmailTemplate;
@@ -20,6 +21,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.stream.Stream;
 
 
 @Service
@@ -49,6 +51,12 @@ public class BookingService {
         Driver driver  = driverRepository.availableCabDriver(availableCab.getCabId());
 
         Booking booking = BookingTransformer.bookingRequestToBooking(bookingRequest, availableCab.getPerKmRate());
+
+        Booking oldBooking = customer.getBooking().stream().filter((b) -> b.getPickup().equals(booking.getPickup())
+                        && b.getDestination().equals(booking.getDestination()) && b.getTripStatus().equals((TripStatus.IN_PROGRESS))).findAny().orElse(null);
+        if(oldBooking != null){
+            throw new RuntimeException("This Journey is already booked by the customer");
+        }
         Booking savedBooking = bookingRepository.save(booking);
 
         availableCab.setAvailable(false);
@@ -61,7 +69,7 @@ public class BookingService {
         BookingResponse bookingResponse = BookingTransformer.bookingToBookingResponse(savedBooking, availableCab,savedDriver,savedCustomer);
 
         //EmailSender to the customer who ever booked the cab
-        sendEmail(bookingResponse);
+//        sendEmail(bookingResponse);
 
         return bookingResponse;
     }
@@ -105,5 +113,29 @@ public class BookingService {
         Booking savedBooking =  bookingRepository.save(booking);
 
         return BookingTransformer.bookingToBookingResponse(savedBooking, driver.getCab(), driver, customer);
+    }
+
+    public boolean cancelBooking(int customerId, String pickUp, String destination) {
+        Customer customer = customerRepository.findById(customerId)
+                .orElseThrow(()-> new CustomerNotFoundException("Customer with Invalid Id"));
+
+        Booking booking = customer.getBooking().stream().filter((b) -> b.getPickup().equals(pickUp)  && b.getDestination().equals(destination)).findFirst()
+                .orElseThrow(()-> new BookingNotFound("Customer has no one Booking with Given Journey"));
+        if(booking.getTripStatus() == TripStatus.CANCELLED){
+            return false;
+        }
+        booking.setTripStatus(TripStatus.CANCELLED);
+        bookingRepository.save(booking);
+
+        Optional<Integer> OptionalDriverId  = bookingRepository.getDriverIdByBookingId(booking.getBookingId());
+        OptionalDriverId.orElseThrow(()-> new NotFetchDriverId("Not Fetch driver id from database SQL Exception"));
+
+        int driverId = OptionalDriverId.get();
+        Driver driver = driverRepository.findById(driverId).orElseThrow(()-> new DriverNotFoundException("Driver Id is Invalid at the service layer"));
+
+        driver.getCab().setAvailable(true);
+        driverRepository.save(driver);
+
+        return true;
     }
 }
