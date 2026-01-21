@@ -15,11 +15,15 @@ public class CustomerTransformer {
                 .build();
     }
 
-    public static CustomerResponse CustomerToCustomerResponse(Customer customer){
+    public static CustomerResponse customerToCustomerResponse(Customer customer){
         return CustomerResponse.builder()
                 .name(customer.getName())
                 .age(customer.getAge())
                 .email(customer.getEmail())
                 .build();
+    }
+
+    public static CustomerResponse customerToCustomerResponseForDriver(Customer customer){
+        return customerToCustomerResponse(customer);
     }
 }

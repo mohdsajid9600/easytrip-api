@@ -15,12 +15,20 @@ public class DriverTransformer {
                 .build();
     }
 
-    public static DriverResponse DriverToDriverResponse(Driver driver){
+    public static DriverResponse driverToDriverResponse(Driver driver){
         return DriverResponse.builder()
                 .name(driver.getName())
                 .age(driver.getAge())
                 .email(driver.getEmail())
                 .driverId(driver.getDriveId())
+                .build();
+    }
+
+    public static DriverResponse driverToDriverResponseForCustomer(Driver driver){
+        return DriverResponse.builder()
+                .name(driver.getName())
+                .age(driver.getAge())
+                .email(driver.getEmail())
                 .build();
     }
 }

@@ -12,4 +12,7 @@ public interface DriverRepository extends JpaRepository<Driver,Integer> {
 
     @Query(value = "select * from driver where cab_id = :availableCabId", nativeQuery = true)
     Driver availableCabDriver(@Param("availableCabId") int availableCabId);
+
+    @Query("SELECT d FROM Driver d JOIN d.booking b WHERE b.bookingId = :bookingId")
+    Driver findByBookingId(int bookingId);
 }

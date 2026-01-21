@@ -2,6 +2,8 @@ package com.sajidtech.easytrip.controller;
 
 import com.sajidtech.easytrip.Enum.Gender;
 import com.sajidtech.easytrip.dto.request.CustomerRequest;
+import com.sajidtech.easytrip.dto.response.BookingResponse;
+import com.sajidtech.easytrip.dto.response.CabResponse;
 import com.sajidtech.easytrip.dto.response.CustomerResponse;
 import com.sajidtech.easytrip.model.Customer;
 import com.sajidtech.easytrip.service.CustomerService;
@@ -12,13 +14,13 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/customer")
+@RequestMapping("/customers")
 public class CustomerController {
 
     @Autowired
     private CustomerService customerService;
 
-    @PostMapping("/register")
+    @PostMapping("/register/customer")
     public ResponseEntity<CustomerResponse> createCustomer(@RequestBody CustomerRequest customerRequest){
         CustomerResponse customerResponse = customerService.createCustomer(customerRequest);
         // return new ResponseEntity<>(customerResponse, HttpStatus.CREATED);
@@ -27,32 +29,57 @@ public class CustomerController {
         }
         return ResponseEntity.status(HttpStatus.CREATED).body(customerResponse);
     }
-    @GetMapping("/get-customer/{id}")
-    public ResponseEntity<CustomerResponse> getCustomerById(@PathVariable("id") int customerId){
+    @GetMapping("/customer")
+    public ResponseEntity<CustomerResponse> getCustomerById(@RequestParam("id") int customerId){
         CustomerResponse customerResponse = customerService.getCustomerById(customerId);
         return ResponseEntity.status(HttpStatus.FOUND).body(customerResponse);
     }
 
-    @GetMapping("/getBy-gender-and-age")
+    @GetMapping("/search")
     public ResponseEntity<List<CustomerResponse>> getAllByGenderAndAge(@RequestParam("gender") Gender gender,
                                                        @RequestParam("age") int age){
         List<CustomerResponse> responses = customerService.getAllByGenderAndAge(gender, age);
         return ResponseEntity.status(HttpStatus.FOUND).body(responses);
     }
 
-    @GetMapping("/getAll/age-greater-then/{age}")
-    public ResponseEntity<List<CustomerResponse>> getAllGreaterThenAge(@PathVariable("age") int age){
+    @GetMapping("/search/greater")
+    public ResponseEntity<List<CustomerResponse>> getAllGreaterThenAge(@RequestParam("age") int age){
         List<CustomerResponse> responses = customerService.getAllGreaterThenAge(age);
         return ResponseEntity.status(HttpStatus.OK).body(responses);
     }
-    @PutMapping("/update/{customerId}")
+    @PutMapping("/customer/{id}/update")
     public ResponseEntity<String> updateCustomerInfo(@RequestBody CustomerRequest customerRequest,
-                                     @PathVariable("customerId") int customerId){
+                                     @PathVariable("id") int customerId){
         boolean isUpdated = customerService.updateCustomerInfo(customerRequest, customerId);
         if(isUpdated){
             return ResponseEntity.status(HttpStatus.OK).body("Your Record updated Successfully!!");
         }
         return ResponseEntity.status(HttpStatus.NOT_MODIFIED).body("Customer not found, Record not updated!");
     }
+
+    @GetMapping("/customer/{id}/bookings")
+    public ResponseEntity<List<BookingResponse>> getAllBookings(@PathVariable("id") int customerId){
+        List<BookingResponse> responses = customerService.getAllBookings(customerId);
+        return ResponseEntity.ok(responses);
+    }
+
+    @GetMapping("/customer/{id}/bookings/completed")
+    public ResponseEntity<List<BookingResponse>> getAllCompletedBookings(@PathVariable("id") int customerId){
+        List<BookingResponse> responses = customerService.getAllCompletedBookings(customerId);
+        return ResponseEntity.ok(responses);
+    }
+
+    @GetMapping("/customer/{id}/bookings/cancelled")
+    public ResponseEntity<List<BookingResponse>> getAllCancelledBookings(@PathVariable("id") int customerId){
+        List<BookingResponse> responses = customerService.getAllCancelledBookings(customerId);
+        return ResponseEntity.ok(responses);
+    }
+
+    @GetMapping("/customer/{id}/bookings/in-progress")
+    public ResponseEntity<BookingResponse> getProgressBookings(@PathVariable("id") int customerId){
+        BookingResponse response = customerService.getProgressBookings(customerId);
+        return ResponseEntity.ok(response);
+    }
+
 
 }

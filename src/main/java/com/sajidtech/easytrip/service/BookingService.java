@@ -20,7 +20,9 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 
@@ -46,17 +48,18 @@ public class BookingService {
         Customer customer = customerRepository.findById(customerId).orElseThrow(()->
                 new CustomerNotFoundException("Invalid customer Id for Booking : "+customerId));
 
+        Booking oldBooking = customer.getBooking().stream().filter((b) -> b.getTripStatus().equals((TripStatus.IN_PROGRESS)))
+                 .findAny().orElse(null);
+        if(oldBooking != null){
+            throw new RuntimeException("The customer has already been One Journey which status is IN_PROGRESS");
+        }
+
         Cab availableCab  = cabRepository.getAvailableCab().orElseThrow(()->
                 new CabUnavailabaleException(" Sorry !!  Cab Unavailable at this time"));
         Driver driver  = driverRepository.availableCabDriver(availableCab.getCabId());
 
         Booking booking = BookingTransformer.bookingRequestToBooking(bookingRequest, availableCab.getPerKmRate());
 
-        Booking oldBooking = customer.getBooking().stream().filter((b) -> b.getPickup().equals(booking.getPickup())
-                        && b.getDestination().equals(booking.getDestination()) && b.getTripStatus().equals((TripStatus.IN_PROGRESS))).findAny().orElse(null);
-        if(oldBooking != null){
-            throw new RuntimeException("This Journey is already booked by the customer");
-        }
         Booking savedBooking = bookingRepository.save(booking);
 
         availableCab.setAvailable(false);
@@ -66,7 +69,7 @@ public class BookingService {
         Customer savedCustomer = customerRepository.save(customer);
         Driver savedDriver = driverRepository.save(driver);
 
-        BookingResponse bookingResponse = BookingTransformer.bookingToBookingResponse(savedBooking, availableCab,savedDriver,savedCustomer);
+        BookingResponse bookingResponse = BookingTransformer.bookingToBookingResponse(savedBooking,availableCab,savedDriver,savedCustomer);
 
         //EmailSender to the customer who ever booked the cab
 //        sendEmail(bookingResponse);
@@ -88,15 +91,6 @@ public class BookingService {
 
     public BookingResponse updateBookedDetails(BookingRequest bookingRequest, int customerId) {
 
-        Optional<Integer> OptionalDriverId = bookingRepository.getDriverIdByCustomerId(customerId);
-
-        if(OptionalDriverId.isEmpty()){
-            throw new DriverIdNotFoundException("We are not fetch DriverId from SQL");
-        }
-        int driverId = OptionalDriverId.get();
-
-        Driver driver = driverRepository.findById(driverId)
-                .orElseThrow(()-> new DriverNotFoundException("Driver Not Found"));
         Customer customer = customerRepository.findById(customerId)
                 .orElseThrow(()-> new CustomerNotFoundException("Customer not found at booking updation"));
 
@@ -105,6 +99,16 @@ public class BookingService {
             throw new BookingNotFound("Customer with id "+ customerId+" have no one booking yet!");
         }
         Booking booking = OptionalBooking.get();
+
+        Optional<Integer> OptionalDriverId = bookingRepository.getDriverIdByCustomerId(customerId);
+        if(OptionalDriverId.isEmpty()){
+            throw new DriverIdNotFoundException("We are not fetch DriverId from SQL");
+        }
+        int driverId = OptionalDriverId.get();
+
+        Driver driver = driverRepository.findById(driverId)
+                .orElseThrow(()-> new DriverNotFoundException("Driver Not Found"));
+
 
         booking.setPickup(bookingRequest.getPickup());
         booking.setDestination(bookingRequest.getDestination());
@@ -115,15 +119,13 @@ public class BookingService {
         return BookingTransformer.bookingToBookingResponse(savedBooking, driver.getCab(), driver, customer);
     }
 
-    public boolean cancelBooking(int customerId, String pickUp, String destination) {
+    public boolean cancelBooking(int customerId) {
         Customer customer = customerRepository.findById(customerId)
                 .orElseThrow(()-> new CustomerNotFoundException("Customer with Invalid Id"));
 
-        Booking booking = customer.getBooking().stream().filter((b) -> b.getPickup().equals(pickUp)  && b.getDestination().equals(destination)).findFirst()
-                .orElseThrow(()-> new BookingNotFound("Customer has no one Booking with Given Journey"));
-        if(booking.getTripStatus() == TripStatus.CANCELLED){
-            return false;
-        }
+        Booking booking = customer.getBooking().stream().filter((b) -> b.getTripStatus().equals(TripStatus.IN_PROGRESS)).findAny()
+                .orElseThrow(()-> new BookingNotFound("Customer has no one Booking which is IN_PROGRESS"));
+
         booking.setTripStatus(TripStatus.CANCELLED);
         bookingRepository.save(booking);
 
@@ -137,5 +139,19 @@ public class BookingService {
         driverRepository.save(driver);
 
         return true;
+    }
+
+    public void completeBookingByDriver(int driverId) {
+       Driver driver = driverRepository.findById(driverId).orElseThrow(()-> new DriverNotFoundException("Invalid Driver ID"));
+
+      Booking booking = driver.getBooking().stream().filter(b -> b.getTripStatus().equals(TripStatus.IN_PROGRESS)).findAny().orElse(null);
+
+      if(booking != null){
+          booking.setTripStatus(TripStatus.COMPLETED);
+          driver.getCab().setAvailable(true);
+          driverRepository.save(driver);
+      }else{
+          throw new BookingNotFound("No one Booking is available in Driver List to the completion");
+      }
     }
 }

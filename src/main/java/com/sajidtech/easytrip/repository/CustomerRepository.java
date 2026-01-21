@@ -17,4 +17,7 @@ public interface CustomerRepository extends JpaRepository<Customer, Integer> {
 
     @Query("select c from Customer c where c.age > :age")
     List<Customer> getAllGreaterThenAge(@Param("age") int age);
+
+    @Query("SELECT c FROM Customer c JOIN c.booking b WHERE b.bookingId = :bookingId")
+    Customer findByBookingId(@Param("bookingId") int bookingId);
 }

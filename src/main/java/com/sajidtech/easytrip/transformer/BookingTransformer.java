@@ -33,8 +33,34 @@ public class BookingTransformer {
                 .billAmount(booking.getBillAmount())
                 .bookedAt(booking.getBookedAt())
                 .lastUpdateAt(booking.getLastUpdateAt())
-                .customerResponse(CustomerTransformer.CustomerToCustomerResponse(customer))
-                .cabResponse(CabTransformer.CabToCabResponse(cab, driver))
+                .customerResponse(CustomerTransformer.customerToCustomerResponse(customer))
+                .cabResponse(CabTransformer.cabToCabResponse(cab, driver))
+                .build();
+    }
+
+    public static BookingResponse bookingToBookingResponseForDriver(Booking booking,Cab cab, Customer customer){
+        return BookingResponse.builder()
+                .pickup(booking.getPickup())
+                .destination(booking.getDestination())
+                .tripDistanceInKm(booking.getTripDistanceInKm())
+                .tripStatus(booking.getTripStatus())
+                .billAmount(booking.getBillAmount())
+                .bookedAt(booking.getBookedAt())
+                .lastUpdateAt(booking.getLastUpdateAt())
+                .cabResponse(CabTransformer.cabToCabResponseForDriver(cab))
+                .customerResponse(CustomerTransformer.customerToCustomerResponseForDriver(customer))
+                .build();
+    }
+    public static BookingResponse bookingToBookingResponseForCustomer(Booking booking, Cab cab, Driver driver){
+        return BookingResponse.builder()
+                .pickup(booking.getPickup())
+                .destination(booking.getDestination())
+                .tripDistanceInKm(booking.getTripDistanceInKm())
+                .tripStatus(booking.getTripStatus())
+                .billAmount(booking.getBillAmount())
+                .bookedAt(booking.getBookedAt())
+                .lastUpdateAt(booking.getLastUpdateAt())
+                .cabResponse(CabTransformer.cabToCabResponseForCustomer(cab, driver))
                 .build();
     }
 }
