@@ -7,10 +7,6 @@ import com.sajidtech.easytrip.model.Booking;
 import com.sajidtech.easytrip.model.Cab;
 import com.sajidtech.easytrip.model.Customer;
 import com.sajidtech.easytrip.model.Driver;
-import lombok.Data;
-import org.springframework.orm.jpa.vendor.Database;
-
-import java.util.Date;
 
 public class BookingTransformer {
 

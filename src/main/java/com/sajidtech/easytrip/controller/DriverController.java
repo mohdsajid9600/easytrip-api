@@ -1,6 +1,5 @@
 package com.sajidtech.easytrip.controller;
 
-import com.sajidtech.easytrip.Enum.TripStatus;
 import com.sajidtech.easytrip.dto.request.DriverRequest;
 import com.sajidtech.easytrip.dto.response.BookingResponse;
 import com.sajidtech.easytrip.dto.response.DriverResponse;

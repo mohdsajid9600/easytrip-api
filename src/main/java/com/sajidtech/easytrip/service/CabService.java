@@ -4,10 +4,8 @@ import com.sajidtech.easytrip.Enum.Status;
 import com.sajidtech.easytrip.dto.request.CabRequest;
 import com.sajidtech.easytrip.dto.response.CabResponse;
 import com.sajidtech.easytrip.exception.CabNotFoundException;
-import com.sajidtech.easytrip.exception.CustomerNotFoundException;
 import com.sajidtech.easytrip.exception.DriverNotFoundException;
 import com.sajidtech.easytrip.model.Cab;
-import com.sajidtech.easytrip.model.Customer;
 import com.sajidtech.easytrip.model.Driver;
 import com.sajidtech.easytrip.repository.CabRepository;
 import com.sajidtech.easytrip.repository.DriverRepository;
@@ -48,7 +46,6 @@ public class CabService {
         cab.setCabModel(cabRequest.getCabModel());
         cab.setCabNumber(cabRequest.getCabNumber());
         cab.setPerKmRate(cabRequest.getPerKmRate());
-
         Driver savedDriver = driverRepository.save(driver);
 
         return CabTransformer.cabToCabResponse(savedDriver.getCab(), savedDriver);
@@ -59,38 +56,11 @@ public class CabService {
         return availableCabs.stream().map(CabTransformer::cabToCabResponseForAvailable).collect(Collectors.toList());
     }
 
-
-    public void deleteCabByDriver(int driverId) {
-        Driver driver = checkExistenceOfDriver(driverId);
-
-        Cab cab = driver.getCab();
-        validateCabForDeletion(cab); // validate or throw exception
-
-        //break Relation
-        driver.setCab(null);
-        driverRepository.save(driver);
-
-        //Delete cab
-        cabRepository.deleteById(cab.getCabId());
-    }
-
     private Driver checkExistenceOfDriver(int driverId) {
         Driver driver = driverRepository.findById(driverId).orElseThrow(()-> new DriverNotFoundException("Driver id is Invalid"));
         if(driver.getStatus() == Status.INACTIVE){
             throw new RuntimeException("Driver is inactive. Access denied");
         }
         return driver;
-    }
-
-    private void validateCabForDeletion(Cab cab) {
-        if(cab == null){
-            throw new CabNotFoundException("Driver has no Cab assigned");
-        }
-        if(cab.getStatus() == Status.INACTIVE){
-            throw new RuntimeException("Cab Already INACTIVE");
-        }
-        if(!cab.isAvailable()){
-            throw new RuntimeException("Cab cannot be deleted because it is currently booked");
-        }
     }
 }

@@ -1,8 +1,7 @@
 package com.sajidtech.easytrip.dto.request;
 
 import com.sajidtech.easytrip.Enum.Gender;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
+
 import lombok.Data;
 
 @Data

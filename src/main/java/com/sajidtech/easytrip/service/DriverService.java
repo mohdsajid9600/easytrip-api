@@ -33,13 +33,7 @@ public class DriverService {
     private DriverRepository driverRepository;
 
     @Autowired
-    CustomerRepository customerRepository;
-
-    @Autowired
-    CabRepository cabRepository;
-
-    @Autowired
-    BookingRepository bookingRepository;
+    private CustomerRepository customerRepository;
 
     public DriverResponse addDriverInfo(DriverRequest driverRequest) {
         Driver driver = DriverTransformer.driverRequestToDriver(driverRequest);
@@ -64,48 +58,36 @@ public class DriverService {
 
     public List<BookingResponse> getAllBookings(int driverId) {
         Driver driver = checkValidDriver(driverId);
-
-        return driver.getBooking().stream().map(booking->{
-
-            Customer customer = customerRepository.findByBookingId(booking.getBookingId());
-            return BookingTransformer.bookingToBookingResponseForDriver(booking, driver.getCab(),customer);
-
-        }).collect(Collectors.toList());
+        return driver.getBooking().stream().map(booking -> getBookingResponseByBooking(booking, driver)).toList();
     }
 
     public List<BookingResponse> getAllCompletedBookings(int driverId) {
         Driver driver = checkValidDriver(driverId);
-        return driver.getBooking().stream().filter(booking-> booking.getTripStatus().equals(TripStatus.COMPLETED)).map(booking->{
-
-            Customer customer = customerRepository.findByBookingId(booking.getBookingId());
-            return BookingTransformer.bookingToBookingResponseForDriver(booking, driver.getCab(),customer);
-
-        }).collect(Collectors.toList());
+        return driver.getBooking().stream()
+                .filter(booking-> booking.getTripStatus().equals(TripStatus.COMPLETED))
+                .map(booking-> getBookingResponseByBooking(booking, driver)).collect(Collectors.toList());
     }
 
     public List<BookingResponse> getAllCancelledBookings(int driverId) {
         Driver driver = checkValidDriver(driverId);
-        return driver.getBooking().stream().filter(booking-> booking.getTripStatus().equals(TripStatus.CANCELLED)).map(booking->{
-
-            Customer customer = customerRepository.findByBookingId(booking.getBookingId());
-            return BookingTransformer.bookingToBookingResponseForDriver(booking, driver.getCab(),customer);
-
-        }).collect(Collectors.toList());
+        return driver.getBooking().stream()
+                .filter(booking-> booking.getTripStatus().equals(TripStatus.CANCELLED))
+                .map(booking -> getBookingResponseByBooking(booking, driver)).collect(Collectors.toList());
     }
 
 
     public BookingResponse getAllInProgressBookings(int driverId) {
         Driver driver = checkValidDriver(driverId);
-        Booking progressBooking = driver.getBooking().stream().filter(booking-> booking.getTripStatus().equals(TripStatus.IN_PROGRESS)).findFirst()
+        Booking progressBooking = driver.getBooking().stream()
+                .filter(booking-> booking.getTripStatus().equals(TripStatus.IN_PROGRESS)).findFirst()
                 .orElseThrow(()-> new BookingNotFound("Driver has no one Booking who is IN_PROGRESS"));
-
-            Customer customer = customerRepository.findByBookingId(progressBooking.getBookingId());
-            return BookingTransformer.bookingToBookingResponseForDriver(progressBooking, driver.getCab(),customer);
+        return getBookingResponseByBooking(progressBooking, driver);
     }
 
     public void deleteDriverById(int driverId) {
         Driver driver = checkValidDriver(driverId);
-        boolean hasActiveBooking = driver.getBooking().stream().anyMatch(booking -> booking.getTripStatus().equals(TripStatus.IN_PROGRESS));
+        boolean hasActiveBooking = driver.getBooking().stream()
+                .anyMatch(booking -> booking.getTripStatus().equals(TripStatus.IN_PROGRESS));
         if(hasActiveBooking){
             throw new RuntimeException("Driver cannot be deleted because it has one Booking IN_PROGRESS");
         }
@@ -116,6 +98,11 @@ public class DriverService {
         }
         driver.setStatus(Status.INACTIVE);
         driverRepository.save(driver);
+    }
+
+    private BookingResponse getBookingResponseByBooking(Booking booking, Driver driver) {
+        Customer customer = customerRepository.findByBookingId(booking.getBookingId());
+        return BookingTransformer.bookingToBookingResponseForDriver(booking, driver.getCab(),customer);
     }
 
     private Driver checkValidDriver(int driverId) {

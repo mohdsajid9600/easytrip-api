@@ -22,6 +22,7 @@ public class CustomerTransformer {
                 .name(customer.getName())
                 .age(customer.getAge())
                 .email(customer.getEmail())
+                .gender(customer.getGender())
                 .status(customer.getStatus())
                 .build();
     }
@@ -31,6 +32,7 @@ public class CustomerTransformer {
                 .name(customer.getName())
                 .age(customer.getAge())
                 .email(customer.getEmail())
+                .gender(customer.getGender())
                 .build();
     }
 }

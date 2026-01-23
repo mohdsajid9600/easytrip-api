@@ -19,7 +19,7 @@ public class DriverTransformer {
 
     public static DriverResponse driverToDriverResponse(Driver driver){
         return DriverResponse.builder()
-                .name(driver.getName())
+                .name(driver.getName().toUpperCase())
                 .age(driver.getAge())
                 .email(driver.getEmail())
                 .driverId(driver.getDriveId())
@@ -29,7 +29,7 @@ public class DriverTransformer {
 
     public static DriverResponse driverToDriverResponseForCustomer(Driver driver){
         return DriverResponse.builder()
-                .name(driver.getName())
+                .name(driver.getName().toUpperCase())
                 .age(driver.getAge())
                 .email(driver.getEmail())
                 .build();

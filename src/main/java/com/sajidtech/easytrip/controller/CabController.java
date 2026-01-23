@@ -36,11 +36,4 @@ public class CabController {
         List<CabResponse> responses = cabService.getAllAvailableCabs();
         return ResponseEntity.ok(responses);
     }
-
-    //API under development
-    @DeleteMapping("/driver/{id}")
-    public ResponseEntity<String> deleteCabByDriver(@PathVariable("id") int driverId){
-//         cabService.deleteCabByDriver(driverId);
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Cab not delete because API is Under development!");
-    }
 }

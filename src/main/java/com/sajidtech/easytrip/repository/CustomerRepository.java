@@ -1,6 +1,7 @@
 package com.sajidtech.easytrip.repository;
 
 import com.sajidtech.easytrip.Enum.Gender;
+import com.sajidtech.easytrip.Enum.Status;
 import com.sajidtech.easytrip.model.Customer;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -20,4 +21,10 @@ public interface CustomerRepository extends JpaRepository<Customer, Integer> {
 
     @Query("SELECT c FROM Customer c JOIN c.booking b WHERE b.bookingId = :bookingId")
     Customer findByBookingId(@Param("bookingId") int bookingId);
+
+    @Query("select c from Customer c where c.status =:status")
+    List<Customer> findByStatus(@Param("status") Status status);
+
+    @Query("SELECT c FROM Customer c JOIN c.booking b WHERE b.bookingId = :bookingId")
+    Customer findCustomerByBookingId(@Param("bookingId") int bookingId);
 }

@@ -1,11 +1,13 @@
 package com.sajidtech.easytrip.repository;
 
-import com.sajidtech.easytrip.model.Cab;
+import com.sajidtech.easytrip.Enum.Status;
 import com.sajidtech.easytrip.model.Driver;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 @Repository
 public interface DriverRepository extends JpaRepository<Driver,Integer> {
@@ -14,5 +16,8 @@ public interface DriverRepository extends JpaRepository<Driver,Integer> {
     Driver availableCabDriver(@Param("availableCabId") int availableCabId);
 
     @Query("SELECT d FROM Driver d JOIN d.booking b WHERE b.bookingId = :bookingId")
-    Driver findByBookingId(int bookingId);
+    Driver findDriverByBookingId(int bookingId);
+
+    @Query("select d from Driver d where d.status =:status")
+    List<Driver> findByStatus(@Param("status") Status status);
 }
