@@ -13,14 +13,17 @@ import org.springframework.web.bind.annotation.*;
 public class BookingController {
 
     // Booking service dependency
-    @Autowired
-    private BookingService bookingService;
+    private final BookingService bookingService;
+
+    public BookingController(BookingService bookingService){
+        this.bookingService = bookingService;
+    }
 
     // Book a cab for customer
     @PostMapping("/customer/{id}/booked")
     public ResponseEntity<ApiResponse<BookingResponse>> bookCab(@RequestBody BookingRequest bookingRequest,
                                                @PathVariable("id") int customerId){
-        BookingResponse bookingResponse = bookingService.bookCab(bookingRequest, customerId);
+        BookingResponse bookingResponse = this.bookingService.bookCab(bookingRequest, customerId);
         return ResponseEntity.ok(ApiResponse.success("Booking created", bookingResponse));
     }
 
@@ -28,21 +31,21 @@ public class BookingController {
     @PutMapping("/customer/{id}/update")
     public ResponseEntity<ApiResponse<BookingResponse>> updateBookedDetails(@RequestBody BookingRequest bookingRequest,
                                                                @PathVariable("id") int customerId){
-        BookingResponse bookingResponse = bookingService.updateBookedDetails(bookingRequest, customerId);
+        BookingResponse bookingResponse = this.bookingService.updateBookedDetails(bookingRequest, customerId);
         return ResponseEntity.ok(ApiResponse.success("Booking updated",bookingResponse));
     }
 
     // Cancel customer booking
     @PutMapping("/customer/{id}/cancel")
     public ResponseEntity<ApiResponse<String>> cancelBooking(@PathVariable("id") int customerId){
-         bookingService.cancelBooking(customerId);
+         this.bookingService.cancelBooking(customerId);
         return ResponseEntity.ok(ApiResponse.success("Booking cancelled"));
     }
 
     // Complete booking by driver
     @PutMapping("/driver/{id}/complete")
     public ResponseEntity<ApiResponse<String>> completeBookingByDriver(@PathVariable("id") int driverId){
-        bookingService.completeBookingByDriver(driverId);
+        this.bookingService.completeBookingByDriver(driverId);
         return ResponseEntity.ok(ApiResponse.success("Booking completed"));
     }
 

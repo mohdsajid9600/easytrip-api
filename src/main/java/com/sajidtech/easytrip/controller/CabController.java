@@ -16,13 +16,16 @@ public class CabController {
 
 
     // Cab service dependency
-    @Autowired
-    private CabService cabService;
+    private final CabService cabService;
+
+    public CabController(CabService cabService){
+        this.cabService = cabService;
+    }
 
     // Register cab for driver
     @PostMapping("/driver/{id}/register")
     public ResponseEntity<ApiResponse<CabResponse>> createCab(@RequestBody CabRequest cabRequest, @PathVariable("id") int driverId){
-        CabResponse cabResponse =  cabService.createCab(cabRequest, driverId);
+        CabResponse cabResponse =  this.cabService.createCab(cabRequest, driverId);
         return ResponseEntity.ok(ApiResponse.success("Cab registered", cabResponse));
     }
 
@@ -30,7 +33,7 @@ public class CabController {
     @PutMapping("/driver/{id}/update")
     public ResponseEntity<ApiResponse<CabResponse>> updateCabByDriver(@RequestBody CabRequest cabRequest,
                                                          @PathVariable("id") int driverId){
-        CabResponse cabResponse = cabService.updateCabByDriver(cabRequest, driverId);
+        CabResponse cabResponse = this.cabService.updateCabByDriver(cabRequest, driverId);
 
         return ResponseEntity.ok(ApiResponse.success("Cab updated", cabResponse));
     }
@@ -38,7 +41,7 @@ public class CabController {
     // Get all available cabs
     @GetMapping("/search/available")
     public ResponseEntity<ApiResponse<List<CabResponse>>> getAllAvailableCabs(){
-        List<CabResponse> responses = cabService.getAllAvailableCabs();
+        List<CabResponse> responses = this.cabService.getAllAvailableCabs();
         return ResponseEntity.ok(ApiResponse.success("Available cabs", responses));
     }
 }
