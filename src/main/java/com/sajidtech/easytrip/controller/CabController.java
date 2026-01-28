@@ -4,6 +4,7 @@ import com.sajidtech.easytrip.dto.request.CabRequest;
 import com.sajidtech.easytrip.dto.response.ApiResponse;
 import com.sajidtech.easytrip.dto.response.CabResponse;
 import com.sajidtech.easytrip.service.CabService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,14 +25,14 @@ public class CabController {
 
     // Register cab for driver
     @PostMapping("/driver/{id}/register")
-    public ResponseEntity<ApiResponse<CabResponse>> createCab(@RequestBody CabRequest cabRequest, @PathVariable("id") int driverId){
+    public ResponseEntity<ApiResponse<CabResponse>> createCab(@Valid @RequestBody CabRequest cabRequest, @PathVariable("id") int driverId){
         CabResponse cabResponse =  this.cabService.createCab(cabRequest, driverId);
         return ResponseEntity.ok(ApiResponse.success("Cab registered", cabResponse));
     }
 
     // Update cab by driver
     @PutMapping("/driver/{id}/update")
-    public ResponseEntity<ApiResponse<CabResponse>> updateCabByDriver(@RequestBody CabRequest cabRequest,
+    public ResponseEntity<ApiResponse<CabResponse>> updateCabByDriver(@Valid @RequestBody CabRequest cabRequest,
                                                          @PathVariable("id") int driverId){
         CabResponse cabResponse = this.cabService.updateCabByDriver(cabRequest, driverId);
 

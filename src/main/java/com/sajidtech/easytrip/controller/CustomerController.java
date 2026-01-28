@@ -6,6 +6,7 @@ import com.sajidtech.easytrip.dto.request.CustomerRequest;
 import com.sajidtech.easytrip.dto.response.BookingResponse;
 import com.sajidtech.easytrip.dto.response.CustomerResponse;
 import com.sajidtech.easytrip.service.CustomerService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,7 +25,7 @@ public class CustomerController {
 
     // Register new customer
     @PostMapping("/register/customer")
-    public ResponseEntity<ApiResponse<CustomerResponse>> createCustomer(@RequestBody CustomerRequest customerRequest){
+    public ResponseEntity<ApiResponse<CustomerResponse>> createCustomer(@Valid @RequestBody CustomerRequest customerRequest){
         CustomerResponse customerResponse = this.customerService.createCustomer(customerRequest);
         return ResponseEntity.ok(ApiResponse.success("Customer Registered", customerResponse));
     }
@@ -53,7 +54,7 @@ public class CustomerController {
 
     // Update customer details
     @PutMapping("/customer/{id}/update")
-    public ResponseEntity<ApiResponse<String>> updateCustomerInfo(@RequestBody CustomerRequest customerRequest,
+    public ResponseEntity<ApiResponse<String>> updateCustomerInfo(@Valid @RequestBody CustomerRequest customerRequest,
                                      @PathVariable("id") int customerId){
         this.customerService.updateCustomerInfo(customerRequest, customerId);
         return ResponseEntity.ok(ApiResponse.success("Customer updated"));

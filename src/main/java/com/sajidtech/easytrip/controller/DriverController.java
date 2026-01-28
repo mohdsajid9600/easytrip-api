@@ -5,6 +5,7 @@ import com.sajidtech.easytrip.dto.response.ApiResponse;
 import com.sajidtech.easytrip.dto.response.BookingResponse;
 import com.sajidtech.easytrip.dto.response.DriverResponse;
 import com.sajidtech.easytrip.service.DriverService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,7 +25,7 @@ public class DriverController {
 
     // Register new driver
     @PostMapping("/register/driver")
-    public ResponseEntity<ApiResponse<DriverResponse>> addDriverInfo(@RequestBody DriverRequest driverRequest){
+    public ResponseEntity<ApiResponse<DriverResponse>> addDriverInfo(@Valid @RequestBody DriverRequest driverRequest){
         DriverResponse driverResponse = this.driverService.addDriverInfo(driverRequest);
         return ResponseEntity.ok(ApiResponse.success("Driver registered", driverResponse));
     }
@@ -38,7 +39,7 @@ public class DriverController {
 
     // Update driver details
     @PutMapping("/driver/{id}/update")
-    public ResponseEntity<ApiResponse<String>> updateDriverInfo(@RequestBody DriverRequest driverRequest,
+    public ResponseEntity<ApiResponse<String>> updateDriverInfo(@Valid @RequestBody DriverRequest driverRequest,
                                                    @PathVariable("id") int driverId){
         this.driverService.updateDriverInfo(driverRequest, driverId);
         return ResponseEntity.ok(ApiResponse.success("Driver updated"));

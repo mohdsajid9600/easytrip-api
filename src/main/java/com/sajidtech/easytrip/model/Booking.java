@@ -32,11 +32,14 @@ public class Booking {
     @Enumerated(value = EnumType.STRING)
     private TripStatus tripStatus;
 
+    @Column(nullable = false)
     private double billAmount;
 
     @CreationTimestamp
+    @Column(updatable = false)
     private Date bookedAt;
 
     @UpdateTimestamp
     private Date lastUpdateAt;
+
 }
