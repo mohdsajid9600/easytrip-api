@@ -19,6 +19,7 @@ import com.sajidtech.easytrip.service.CustomerService;
 import com.sajidtech.easytrip.transformer.BookingTransformer;
 import com.sajidtech.easytrip.transformer.CustomerTransformer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -38,8 +39,12 @@ public class CustomerServiceImpl implements CustomerService {
 
 
     public CustomerResponse createProfile(CustomerRequest customerRequest, String email) {
+        User user = this.userRepository.findByEmail(email)
+                .orElseThrow(()-> new UsernameNotFoundException("User not found"));
+        if(user.getProfileStatus().equals(Status.INACTIVE)){
+            throw new RuntimeException("Customer is inactive. Access denied");
+        }
         Customer customer = CustomerTransformer.customerRequestToCustomer(customerRequest);
-        User user = this.userRepository.findByEmail(email).orElseThrow(()-> new RuntimeException("User not Found"));
         customer.setEmail(user.getEmail());
         customer.setUser(user);
         Customer savedCustomer = this.customerRepository.save(customer);
@@ -61,33 +66,6 @@ public class CustomerServiceImpl implements CustomerService {
         customerRepository.save(customer);
     }
 
-    public List<BookingResponse> getAllBookings(String email) {
-        Customer customer = checkValidCustomer(email);
-        return customer.getBooking().stream().map(this::getBookingResponseByBooking).toList();
-    }
-
-    public List<BookingResponse> getAllCompletedBookings(String email) {
-        Customer customer = checkValidCustomer(email);
-        return customer.getBooking().stream()
-                .filter(booking -> booking.getTripStatus().equals(TripStatus.COMPLETED))
-                .map(this::getBookingResponseByBooking).toList();
-    }
-
-    public List<BookingResponse> getAllCancelledBookings(String email) {
-        Customer customer = checkValidCustomer(email);
-        return customer.getBooking().stream()
-                .filter(booking -> booking.getTripStatus().equals(TripStatus.CANCELLED))
-                .map(this::getBookingResponseByBooking).collect(Collectors.toList());
-    }
-
-    public BookingResponse getProgressBookings(String email) {
-        Customer customer = checkValidCustomer(email);
-        Booking progressBooking = customer.getBooking().stream()
-                .filter(booking -> booking.getTripStatus().equals(TripStatus.IN_PROGRESS))
-                .findFirst().orElseThrow(()-> new BookingNotFoundException("Customer has no one Booking who are IN_PROGRESS"));
-        return getBookingResponseByBooking(progressBooking);
-    }
-
     public void deactivateProfile(String email) {
         Customer customer = checkValidCustomer(email);
         boolean hasBooking = customer.getBooking().stream().anyMatch(b -> b.getTripStatus().equals(TripStatus.IN_PROGRESS));
@@ -98,11 +76,6 @@ public class CustomerServiceImpl implements CustomerService {
         customer.getUser().setProfileStatus(Status.INACTIVE);
         customerRepository.save(customer);
 
-    }
-
-    private BookingResponse getBookingResponseByBooking(Booking booking) {
-        Driver driver = driverRepository.findDriverByBookingId(booking.getBookingId());
-        return BookingTransformer.bookingToBookingResponseForCustomer(booking, driver.getCab(), driver);
     }
 
     private Customer checkValidCustomer(String email) {

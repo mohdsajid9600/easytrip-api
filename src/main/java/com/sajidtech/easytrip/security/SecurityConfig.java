@@ -5,7 +5,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -27,11 +26,12 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // public APIs
                         .requestMatchers("/auth/**", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                        .requestMatchers("/auth/change-password").authenticated()
 
                         // role based APIs
                         .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/drivers/**","/booking/driver/**","/cab/driver/**").hasRole("DRIVER")
-                        .requestMatchers("/customers/**","/booking/customer/**","/cab/search/available").hasRole("CUSTOMER")
+                        .requestMatchers("/driver/**","/booking/driver/**","/cab/driver/**").hasRole("DRIVER")
+                        .requestMatchers("/customer/**","/booking/customer/**","/cab/available").hasRole("CUSTOMER")
 
                         // everything else must be authenticated
                         .anyRequest().authenticated()

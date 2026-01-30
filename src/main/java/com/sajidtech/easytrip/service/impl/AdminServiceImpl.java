@@ -45,9 +45,13 @@ public class AdminServiceImpl implements AdminService {
     @Autowired
     private BookingRepository bookingRepository;
 
+//___________________________________________BUSINESS LOGIC SECTION________________________________________________________________________
+
+
+//_______________________________________________FOR CUSTOMER___________________________________________________________________________
 
     public List<CustomerResponse> getAllCustomer() {
-        List<Customer> customerList = customerRepository.findAll();
+        List<Customer> customerList = this.customerRepository.findAll();
         return customerList.stream().map(CustomerTransformer::customerToCustomerResponse).toList();
     }
 
@@ -57,29 +61,30 @@ public class AdminServiceImpl implements AdminService {
     }
 
     public List<CustomerResponse> getAllByGenderAndAge(Gender gender, int age) {
-        List<Customer> customers = customerRepository.findByGenderAndAge(gender, age);
+        List<Customer> customers = this.customerRepository.findByGenderAndAge(gender, age);
         return customers.stream().map(CustomerTransformer::customerToCustomerResponse).collect(Collectors.toList());
     }
 
     public List<CustomerResponse> getAllGreaterThenAge(int age) {
-        List<Customer> customers = customerRepository.getAllGreaterThenAge(age);
+        List<Customer> customers = this.customerRepository.getAllGreaterThenAge(age);
         return customers.stream().map(CustomerTransformer::customerToCustomerResponse).collect(Collectors.toList());
     }
 
     public List<CustomerResponse> getActiveCustomers() {
-       List<Customer> customerList = customerRepository.findByStatus(Status.ACTIVE);
+       List<Customer> customerList = this.customerRepository.findByStatus(Status.ACTIVE);
       return customerList.stream().map(CustomerTransformer::customerToCustomerResponse).toList();
     }
 
     public List<CustomerResponse> getInactiveCustomers() {
-        List<Customer> customerList = customerRepository.findByStatus(Status.INACTIVE);
+        List<Customer> customerList = this.customerRepository.findByStatus(Status.INACTIVE);
         return customerList.stream().map(CustomerTransformer::customerToCustomerResponse).toList();
     }
 
     public CustomerResponse activeCustomer(int customerId) {
         Customer customer = getAndThrowCustomer(customerId);
         customer.setStatus(Status.ACTIVE);
-        Customer savedCustomer = customerRepository.save(customer);
+        customer.getUser().setProfileStatus(Status.ACTIVE);
+        Customer savedCustomer = this.customerRepository.save(customer);
         return  CustomerTransformer.customerToCustomerResponse(savedCustomer);
     }
 
@@ -88,17 +93,21 @@ public class AdminServiceImpl implements AdminService {
         Booking booking =  getBookingOrNullByCustomer(customer);
         if(booking != null){
             booking.setTripStatus(TripStatus.CANCELLED);
-            Driver driver = driverRepository.findDriverByBookingId(booking.getBookingId());
+            Driver driver = this.driverRepository.findDriverByBookingId(booking.getBookingId());
             driver.getCab().setAvailable(true);
-            driverRepository.save(driver);
+            this.driverRepository.save(driver);
         }
         customer.setStatus(Status.INACTIVE);
-        Customer savedCustomer = customerRepository.save(customer);
+        customer.getUser().setProfileStatus(Status.INACTIVE);
+        Customer savedCustomer = this.customerRepository.save(customer);
         return  CustomerTransformer.customerToCustomerResponse(savedCustomer);
     }
 
+
+//___________________________________________________FOR DRIVER________________________________________________________________________
+
     public List<DriverResponse> getAllDrivers() {
-        List<Driver> driverList = driverRepository.findAll();
+        List<Driver> driverList = this.driverRepository.findAll();
         return driverList.stream().map(DriverTransformer::driverToDriverResponse).toList();
     }
 
@@ -108,25 +117,26 @@ public class AdminServiceImpl implements AdminService {
     }
 
     public List<DriverResponse> getActiveDrivers() {
-       List<Driver> driverList = driverRepository.findByStatus(Status.ACTIVE);
+       List<Driver> driverList = this.driverRepository.findByStatus(Status.ACTIVE);
        return driverList.stream().map(DriverTransformer::driverToDriverResponse).toList();
     }
 
     public List<DriverResponse> getInactiveDrivers() {
-        List<Driver> driverList = driverRepository.findByStatus(Status.INACTIVE);
+        List<Driver> driverList = this.driverRepository.findByStatus(Status.INACTIVE);
         return driverList.stream().map(DriverTransformer::driverToDriverResponse).toList();
     }
 
     public DriverResponse activeDriver(int driverId) {
         Driver driver = getAndThrowDriver(driverId);
         driver.setStatus(Status.ACTIVE);
+        driver.getUser().setProfileStatus(Status.ACTIVE);
         Cab cab = driver.getCab();
         if(cab != null){
             driver.getCab().setStatus(Status.ACTIVE);
             driver.getCab().setAvailable(true);
         }
-        Driver savedDriver = driverRepository.save(driver);
-        return DriverTransformer.driverToDriverResponse(driver);
+        Driver savedDriver = this.driverRepository.save(driver);
+        return DriverTransformer.driverToDriverResponse(savedDriver);
     }
 
     public DriverResponse inActiveDriver(int driverId) {
@@ -138,14 +148,19 @@ public class AdminServiceImpl implements AdminService {
         Cab cab = driver.getCab();
         if(cab != null){
             cab.setStatus(Status.INACTIVE);
+            cab.setAvailable(false);
         }
         driver.setStatus(Status.INACTIVE);
-        Driver savedDriver = driverRepository.save(driver);
+        driver.getUser().setProfileStatus(Status.INACTIVE);
+        Driver savedDriver = this.driverRepository.save(driver);
         return DriverTransformer.driverToDriverResponse(savedDriver);
     }
 
+
+//_________________________________________________FOR CAB________________________________________________________________________
+
     public List<CabResponse> getAllCabs() {
-        List<Cab> cabList = cabRepository.findAll();
+        List<Cab> cabList = this.cabRepository.findAll();
         return cabList.stream().map(this::getCabResponseByCab).toList();
     }
 
@@ -155,27 +170,30 @@ public class AdminServiceImpl implements AdminService {
     }
 
     public List<CabResponse> getActiveCabs() {
-        List<Cab> cabList = cabRepository.findByStatus(Status.ACTIVE);
+        List<Cab> cabList = this.cabRepository.findByStatus(Status.ACTIVE);
         return cabList.stream().map(this::getCabResponseByCab).toList();
     }
 
     public List<CabResponse> getInactiveCabs() {
-        List<Cab> cabList = cabRepository.findByStatus(Status.INACTIVE);
+        List<Cab> cabList = this.cabRepository.findByStatus(Status.INACTIVE);
         return cabList.stream().map(this::getCabResponseByCab).toList();
     }
 
     public List<CabResponse> getAvailableCabs() {
-        List<Cab> cabList = cabRepository.getAllAvailableCab();
+        List<Cab> cabList = this.cabRepository.getAllAvailableCab();
         return cabList.stream().map(this::getCabResponseByCab).toList();
     }
 
     public List<CabResponse> getUnavailableCabs() {
-        List<Cab> cabList = cabRepository.getUnavailableCab();
+        List<Cab> cabList = this.cabRepository.getUnavailableCab();
         return cabList.stream().map(this::getCabResponseByCab).toList();
     }
 
+
+//__________________________________________________FOR BOOKING________________________________________________________________________
+
     public List<BookingResponse> getAllBookings() {
-        List<Booking> bookingList = bookingRepository.findAll();
+        List<Booking> bookingList = this.bookingRepository.findAll();
         return bookingList.stream().map(this::getBookingResponseByBooking).toList();
     }
 
@@ -195,19 +213,22 @@ public class AdminServiceImpl implements AdminService {
     }
 
     public List<BookingResponse> getActiveBookings() {
-        List<Booking> bookingList = bookingRepository.findByTripStatus(TripStatus.IN_PROGRESS);
+        List<Booking> bookingList = this.bookingRepository.findByTripStatus(TripStatus.IN_PROGRESS);
         return bookingList.stream().map(this::getBookingResponseByBooking).toList();
     }
 
     public List<BookingResponse> getCompletedBookings() {
-        List<Booking> bookingList = bookingRepository.findByTripStatus(TripStatus.COMPLETED);
+        List<Booking> bookingList = this.bookingRepository.findByTripStatus(TripStatus.COMPLETED);
         return bookingList.stream().map(this::getBookingResponseByBooking).toList();
     }
 
     public List<BookingResponse> getCancelledBookings() {
-        List<Booking> bookingList = bookingRepository.findByTripStatus(TripStatus.CANCELLED);
+        List<Booking> bookingList = this.bookingRepository.findByTripStatus(TripStatus.CANCELLED);
         return bookingList.stream().map(this::getBookingResponseByBooking).toList();
     }
+
+
+//___________________________________________HELPER METHODS SECTION________________________________________________________________________
 
     private Booking getBookingOrNullByCustomer(Customer customer) {
         return customer.getBooking().stream().filter(b -> b.getTripStatus().equals(TripStatus.IN_PROGRESS))
@@ -219,31 +240,31 @@ public class AdminServiceImpl implements AdminService {
     }
 
     private Customer getAndThrowCustomer(int customerId) {
-        return customerRepository.findById(customerId)
+        return this.customerRepository.findById(customerId)
                 .orElseThrow(()-> new CustomerNotFoundException("Customer Id is invalid"));
     }
 
     private Driver getAndThrowDriver(int driverId) {
-        return driverRepository.findById(driverId).orElseThrow(()-> new DriverNotFoundException("Driver id is Invalid"));
+        return this.driverRepository.findById(driverId).orElseThrow(()-> new DriverNotFoundException("Driver id is Invalid"));
     }
 
     private Cab getAndThrowCab(int cabId) {
-        return cabRepository.findById(cabId).orElseThrow(()-> new CabNotFoundException("Cab id is Invalid"));
+        return this.cabRepository.findById(cabId).orElseThrow(()-> new CabNotFoundException("Cab id is Invalid"));
     }
 
     private CabResponse getCabResponseByCab(Cab cab) {
-        Driver driver = cabRepository.getDriverByCabId(cab.getCabId());
+        Driver driver = this.cabRepository.getDriverByCabId(cab.getCabId());
         return CabTransformer.cabToCabResponse(driver.getCab(), driver);
     }
 
     private BookingResponse getBookingResponseByBooking(Booking b) {
-        Customer customer = customerRepository.findCustomerByBookingId(b.getBookingId());
-        Driver driver = driverRepository.findDriverByBookingId(b.getBookingId());
+        Customer customer = this.customerRepository.findCustomerByBookingId(b.getBookingId());
+        Driver driver = this.driverRepository.findDriverByBookingId(b.getBookingId());
         return BookingTransformer.bookingToBookingResponse(b,driver.getCab(),driver, customer);
     }
 
     private Booking getAndThrowBooking(int bookingId) {
-        return bookingRepository.findById(bookingId).orElseThrow(()-> new BookingNotFoundException("Booking id is Invalid"));
+        return this.bookingRepository.findById(bookingId).orElseThrow(()-> new BookingNotFoundException("Booking id is Invalid"));
     }
 }
 

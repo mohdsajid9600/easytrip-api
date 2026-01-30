@@ -52,6 +52,30 @@ public class GlobalExceptionHandler {
         );
     }
 
+    @ExceptionHandler(InvalidOldPasswordException.class)
+    public ResponseEntity<ApiErrorResponse> handleInvalidOldPassword(InvalidOldPasswordException ex) {
+        return new ResponseEntity<>(
+                new ApiErrorResponse(false, ex.getMessage(), "BAD_REQUEST", 400),
+                HttpStatus.BAD_REQUEST
+        );
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<ApiErrorResponse> handleUserNotFound(UserNotFoundException ex) {
+        return new ResponseEntity<>(
+                new ApiErrorResponse(false, ex.getMessage(), "NOT_FOUND", 404),
+                HttpStatus.NOT_FOUND
+        );
+    }
+
+    @ExceptionHandler(PasswordMismatchException.class)
+    public ResponseEntity<ApiErrorResponse> handlePasswordMismatch(PasswordMismatchException ex) {
+        return new ResponseEntity<>(
+                new ApiErrorResponse(false, ex.getMessage(), "BAD_REQUEST", 400),
+                HttpStatus.BAD_REQUEST
+        );
+    }
+
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ApiErrorResponse> handleBusiness(RuntimeException ex) {
         return new ResponseEntity<>(

@@ -12,7 +12,6 @@ public class DriverTransformer {
         return Driver.builder()
                 .name(driverRequest.getName())
                 .age(driverRequest.getAge())
-                .email(driverRequest.getEmail())
                 .status(Status.ACTIVE)
                 .build();
     }

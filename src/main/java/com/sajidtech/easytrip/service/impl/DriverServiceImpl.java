@@ -7,19 +7,19 @@ import com.sajidtech.easytrip.dto.response.BookingResponse;
 import com.sajidtech.easytrip.dto.response.DriverResponse;
 import com.sajidtech.easytrip.exception.BookingNotFoundException;
 import com.sajidtech.easytrip.exception.DriverNotFoundException;
-import com.sajidtech.easytrip.model.Booking;
-import com.sajidtech.easytrip.model.Cab;
-import com.sajidtech.easytrip.model.Customer;
-import com.sajidtech.easytrip.model.Driver;
+import com.sajidtech.easytrip.model.*;
 import com.sajidtech.easytrip.repository.CustomerRepository;
 import com.sajidtech.easytrip.repository.DriverRepository;
+import com.sajidtech.easytrip.repository.UserRepository;
 import com.sajidtech.easytrip.service.DriverService;
 import com.sajidtech.easytrip.transformer.BookingTransformer;
 import com.sajidtech.easytrip.transformer.DriverTransformer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,57 +33,39 @@ public class DriverServiceImpl implements DriverService {
     @Autowired
     private CustomerRepository customerRepository;
 
-    public DriverResponse addDriverInfo(DriverRequest driverRequest) {
+    @Autowired
+    private UserRepository userRepository;
+
+    public DriverResponse createProfile(DriverRequest driverRequest, String email) {
+        User user = this.userRepository.findByEmail(email)
+                .orElseThrow(()-> new UsernameNotFoundException("User not found"));
+        if(user.getProfileStatus().equals(Status.INACTIVE)){
+            throw new RuntimeException("Driver is inactive. Access denied");
+        }
         Driver driver = DriverTransformer.driverRequestToDriver(driverRequest);
+
+        driver.setEmail(email);
+        driver.setUser(user);
         Driver savedDriver = driverRepository.save(driver);
         return DriverTransformer.driverToDriverResponse(savedDriver);
     }
 
-    public DriverResponse getDriverById(int driverId) {
-        Driver driver = checkValidDriver(driverId);
+    public DriverResponse getProfile(String email) {
+        Driver driver = checkValidDriver(email);
         return DriverTransformer.driverToDriverResponse(driver);
     }
 
-    public void updateDriverInfo(DriverRequest driverRequest, int driverId) {
-        Driver driver = checkValidDriver(driverId);
+    public void updateProfile(DriverRequest driverRequest, String email) {
+        Driver driver = checkValidDriver(email);
 
         driver.setName(driverRequest.getName());
         driver.setAge(driverRequest.getAge());
-        driver.setEmail(driverRequest.getEmail());
 
-        driverRepository.save(driver);
+        this.driverRepository.save(driver);
     }
 
-    public List<BookingResponse> getAllBookings(int driverId) {
-        Driver driver = checkValidDriver(driverId);
-        return driver.getBooking().stream().map(booking -> getBookingResponseByBooking(booking, driver)).toList();
-    }
-
-    public List<BookingResponse> getAllCompletedBookings(int driverId) {
-        Driver driver = checkValidDriver(driverId);
-        return driver.getBooking().stream()
-                .filter(booking-> booking.getTripStatus().equals(TripStatus.COMPLETED))
-                .map(booking-> getBookingResponseByBooking(booking, driver)).collect(Collectors.toList());
-    }
-
-    public List<BookingResponse> getAllCancelledBookings(int driverId) {
-        Driver driver = checkValidDriver(driverId);
-        return driver.getBooking().stream()
-                .filter(booking-> booking.getTripStatus().equals(TripStatus.CANCELLED))
-                .map(booking -> getBookingResponseByBooking(booking, driver)).collect(Collectors.toList());
-    }
-
-
-    public BookingResponse getAllInProgressBookings(int driverId) {
-        Driver driver = checkValidDriver(driverId);
-        Booking progressBooking = driver.getBooking().stream()
-                .filter(booking-> booking.getTripStatus().equals(TripStatus.IN_PROGRESS)).findFirst()
-                .orElseThrow(()-> new BookingNotFoundException("Driver has no one Booking who is IN_PROGRESS"));
-        return getBookingResponseByBooking(progressBooking, driver);
-    }
-
-    public void deleteDriverById(int driverId) {
-        Driver driver = checkValidDriver(driverId);
+    public void profileInactive(String email) {
+        Driver driver = checkValidDriver(email);
         boolean hasActiveBooking = driver.getBooking().stream()
                 .anyMatch(booking -> booking.getTripStatus().equals(TripStatus.IN_PROGRESS));
         if(hasActiveBooking){
@@ -95,17 +77,13 @@ public class DriverServiceImpl implements DriverService {
             cab.setStatus(Status.INACTIVE);
         }
         driver.setStatus(Status.INACTIVE);
-        driverRepository.save(driver);
+        driver.getUser().setProfileStatus(Status.INACTIVE);
+        this.driverRepository.save(driver);
     }
 
-    private BookingResponse getBookingResponseByBooking(Booking booking, Driver driver) {
-        Customer customer = customerRepository.findByBookingId(booking.getBookingId());
-        return BookingTransformer.bookingToBookingResponseForDriver(booking, driver.getCab(),customer);
-    }
-
-    private Driver checkValidDriver(int driverId) {
-        Driver driver = driverRepository.findById(driverId)
-                .orElseThrow(() -> new DriverNotFoundException("Driver ID Invalid with : "+driverId));
+    private Driver checkValidDriver(String email) {
+        Driver driver = this.driverRepository.findByEmail(email)
+                .orElseThrow(() -> new DriverNotFoundException("Driver not Found"));
         if(driver.getStatus() == Status.INACTIVE){
             throw new RuntimeException("Driver is inactive. Access denied");
         }

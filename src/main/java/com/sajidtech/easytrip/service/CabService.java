@@ -7,9 +7,9 @@ import java.util.List;
 
 public interface CabService {
 
-    CabResponse createCab(CabRequest cabRequest, int driverId);
+    CabResponse createCab(CabRequest cabRequest, String email);
 
-    CabResponse updateCabByDriver(CabRequest cabRequest, int driverId);
+    CabResponse updateCabByDriver(CabRequest cabRequest, String email);
 
     List<CabResponse> getAllAvailableCabs();
 

@@ -1,26 +1,16 @@
 package com.sajidtech.easytrip.service;
 
 import com.sajidtech.easytrip.dto.request.DriverRequest;
-import com.sajidtech.easytrip.dto.response.BookingResponse;
 import com.sajidtech.easytrip.dto.response.DriverResponse;
 
-import java.util.List;
 
 public interface DriverService {
 
-    DriverResponse addDriverInfo(DriverRequest driverRequest);
+    DriverResponse createProfile(DriverRequest driverRequest, String email);
 
-    DriverResponse getDriverById(int driverId);
+    DriverResponse getProfile(String email);
 
-    void updateDriverInfo(DriverRequest driverRequest, int driverId);
+    void updateProfile(DriverRequest driverRequest, String email);
 
-    List<BookingResponse> getAllBookings(int driverId);
-
-    List<BookingResponse> getAllCompletedBookings(int driverId);
-
-    List<BookingResponse> getAllCancelledBookings(int driverId);
-
-    BookingResponse getAllInProgressBookings(int driverId);
-
-    void deleteDriverById(int driverId);
+    void profileInactive(String email);
 }

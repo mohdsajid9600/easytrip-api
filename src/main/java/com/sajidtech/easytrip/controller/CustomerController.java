@@ -13,7 +13,7 @@ import java.security.Principal;
 import java.util.List;
 
 @RestController
-@RequestMapping("/customers")
+@RequestMapping("/customer")
 public class CustomerController {
 
     // Service layer dependency
@@ -24,7 +24,7 @@ public class CustomerController {
     }
 
     // Register new customer
-    @PostMapping("/create-profile/customer")
+    @PostMapping("/create-profile")
     public ResponseEntity<ApiResponse<CustomerResponse>> createProfile(@Valid @RequestBody CustomerRequest customerRequest, Principal principal){
         CustomerResponse customerResponse = this.customerService.createProfile(customerRequest, principal.getName());
         return ResponseEntity.ok(ApiResponse.success("Customer Registered", customerResponse));
@@ -38,39 +38,11 @@ public class CustomerController {
     }
 
     // Update customer details
-    @PutMapping("/update/me")
+    @PutMapping("/me/update")
     public ResponseEntity<ApiResponse<String>> updateCustomerInfo(@Valid @RequestBody CustomerRequest customerRequest,
                                      Principal principal){
         this.customerService.updateCustomerInfo(customerRequest, principal.getName());
         return ResponseEntity.ok(ApiResponse.success("Customer updated"));
-    }
-
-    // Get all bookings of customer
-    @GetMapping("/customer/bookings")
-    public ResponseEntity<ApiResponse<List<BookingResponse>>> getAllBookings(Principal principal){
-        List<BookingResponse> responses = this.customerService.getAllBookings(principal.getName());
-        return ResponseEntity.ok(ApiResponse.success("Bookings fetched", responses));
-    }
-
-    // Get completed bookings
-    @GetMapping("/customer/bookings/completed")
-    public ResponseEntity<ApiResponse<List<BookingResponse>>> getAllCompletedBookings(Principal principal){
-        List<BookingResponse> responses = this.customerService.getAllCompletedBookings(principal.getName());
-        return ResponseEntity.ok(ApiResponse.success("Completed bookings", responses));
-    }
-
-    // Get cancelled bookings
-    @GetMapping("/customer/bookings/cancelled")
-    public ResponseEntity<ApiResponse<List<BookingResponse>>> getAllCancelledBookings(Principal principal){
-        List<BookingResponse> responses = this.customerService.getAllCancelledBookings(principal.getName());
-        return ResponseEntity.ok(ApiResponse.success("Cancelled bookings", responses));
-    }
-
-    // Get in-progress booking
-    @GetMapping("/customer/bookings/in-progress")
-    public ResponseEntity<ApiResponse<BookingResponse>> getProgressBookings(Principal principal){
-        BookingResponse response = this.customerService.getProgressBookings(principal.getName());
-        return ResponseEntity.ok(ApiResponse.success("Active booking", response));
     }
 
     //In Active customer

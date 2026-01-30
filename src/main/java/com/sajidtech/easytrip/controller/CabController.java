@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -24,23 +25,23 @@ public class CabController {
     }
 
     // Register cab for driver
-    @PostMapping("/driver/{id}/register")
-    public ResponseEntity<ApiResponse<CabResponse>> createCab(@Valid @RequestBody CabRequest cabRequest, @PathVariable("id") int driverId){
-        CabResponse cabResponse =  this.cabService.createCab(cabRequest, driverId);
+    @PostMapping("/driver/register")
+    public ResponseEntity<ApiResponse<CabResponse>> createCab(@Valid @RequestBody CabRequest cabRequest, Principal principal){
+        CabResponse cabResponse =  this.cabService.createCab(cabRequest, principal.getName());
         return ResponseEntity.ok(ApiResponse.success("Cab registered", cabResponse));
     }
 
     // Update cab by driver
-    @PutMapping("/driver/{id}/update")
+    @PutMapping("/driver/update")
     public ResponseEntity<ApiResponse<CabResponse>> updateCabByDriver(@Valid @RequestBody CabRequest cabRequest,
-                                                         @PathVariable("id") int driverId){
-        CabResponse cabResponse = this.cabService.updateCabByDriver(cabRequest, driverId);
+                                                         Principal principal){
+        CabResponse cabResponse = this.cabService.updateCabByDriver(cabRequest, principal.getName());
 
         return ResponseEntity.ok(ApiResponse.success("Cab updated", cabResponse));
     }
 
     // Get all available cabs
-    @GetMapping("/search/available")
+    @GetMapping("/available")
     public ResponseEntity<ApiResponse<List<CabResponse>>> getAllAvailableCabs(){
         List<CabResponse> responses = this.cabService.getAllAvailableCabs();
         return ResponseEntity.ok(ApiResponse.success("Available cabs", responses));

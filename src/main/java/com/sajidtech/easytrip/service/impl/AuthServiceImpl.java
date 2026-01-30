@@ -1,9 +1,13 @@
 package com.sajidtech.easytrip.service.impl;
 
+import com.sajidtech.easytrip.dto.request.ChangePasswordRequest;
 import com.sajidtech.easytrip.dto.request.LoginRequest;
 import com.sajidtech.easytrip.dto.request.SignupRequest;
 import com.sajidtech.easytrip.enums.Role;
 import com.sajidtech.easytrip.enums.Status;
+import com.sajidtech.easytrip.exception.InvalidOldPasswordException;
+import com.sajidtech.easytrip.exception.PasswordMismatchException;
+import com.sajidtech.easytrip.exception.UserNotFoundException;
 import com.sajidtech.easytrip.model.User;
 import com.sajidtech.easytrip.repository.UserRepository;
 import com.sajidtech.easytrip.service.AuthService;
@@ -73,5 +77,26 @@ public class AuthServiceImpl implements AuthService {
 
         return "Login successful";
     }
+
+    public void changePassword(String email, ChangePasswordRequest request) {
+
+        User user = this.userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        // old password match check
+        if (!this.passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
+            throw new InvalidOldPasswordException("Old password is incorrect");
+        }
+
+        // 2. New & Confirm password match
+        if (!request.getNewPassword().equals(request.getConfirmPassword())) {
+            throw new PasswordMismatchException("New password and confirm password do not match");
+        }
+
+        // new password encode + save
+        user.setPassword(this.passwordEncoder.encode(request.getNewPassword()));
+        this.userRepository.save(user);
+    }
+
 }
 

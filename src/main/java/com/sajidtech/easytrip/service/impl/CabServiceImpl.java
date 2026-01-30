@@ -27,8 +27,8 @@ public class CabServiceImpl implements CabService {
     private DriverRepository driverRepository;
 
     @Override
-    public CabResponse createCab(CabRequest cabRequest, int driverId) {
-        Driver driver = checkExistenceOfDriver(driverId);
+    public CabResponse createCab(CabRequest cabRequest, String email) {
+        Driver driver = checkExistenceOfDriver(email);
         if(driver.getCab() != null){
             throw new RuntimeException("Driver have already registered one cab !");
         }
@@ -39,8 +39,8 @@ public class CabServiceImpl implements CabService {
     }
 
     @Override
-    public CabResponse updateCabByDriver(CabRequest cabRequest, int driverId) {
-        Driver driver = checkExistenceOfDriver(driverId);
+    public CabResponse updateCabByDriver(CabRequest cabRequest, String email) {
+        Driver driver = checkExistenceOfDriver(email);
         Cab cab = driver.getCab();
         if(cab == null){
             throw new CabNotFoundException("Cab not found by Driver");
@@ -62,6 +62,14 @@ public class CabServiceImpl implements CabService {
 
     private Driver checkExistenceOfDriver(int driverId) {
         Driver driver = driverRepository.findById(driverId).orElseThrow(()-> new DriverNotFoundException("Driver id is Invalid"));
+        if(driver.getStatus() == Status.INACTIVE){
+            throw new RuntimeException("Driver is inactive. Access denied");
+        }
+        return driver;
+    }
+
+    private Driver checkExistenceOfDriver(String email) {
+        Driver driver = driverRepository.findByEmail(email).orElseThrow(()-> new DriverNotFoundException("Driver Not Found"));
         if(driver.getStatus() == Status.INACTIVE){
             throw new RuntimeException("Driver is inactive. Access denied");
         }
