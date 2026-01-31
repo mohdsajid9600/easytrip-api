@@ -1,103 +1,182 @@
 # EasyTrip-APP
 
-EasyTrip is a RESTful backend application built using Spring Boot for a cab booking system.  
-It provides APIs to manage customers, drivers, cabs, and bookings with support for booking creation, cancellation, and trip completion along with email notifications.
+EasyTrip is a secure, role-based RESTful backend application built using Spring Boot for a cab booking system.
+It provides APIs to manage authentication, customers, drivers, cabs, and bookings with support for secure login, ownership-based access, and admin controls.
 
 ## 🔍 About Project
 
-EasyTrip is a backend RESTful web application developed using Spring Boot for managing a cab booking system.
-This project is designed to handle complete cab booking operations including customer management, driver management, cab management, booking process and admin controls.
+EasyTrip is a secure and scalable backend RESTful web application developed using Spring Boot for managing a complete cab booking system. The application is designed around dedicated dashboards for Customer, Driver, and Admin, with strict authentication and role-based authorization applied across all APIs. Customers can manage their profiles and book cabs, drivers can handle trip execution and booking status updates, and administrators can monitor and control customers, drivers, cabs, and bookings efficiently. All user operations are protected through ownership-based access control, ensuring that each user can access only their own data and related bookings.
 
-The system allows customers to book cabs, drivers to complete rides, and admins to manage customers, cabs, and bookings efficiently.
-It follows a clean layered architecture with Controller, Service, Repository, DTO and Transformer layers to maintain scalability and readability.
-
-The application also **supports email notifications** to inform customers about booking **confirmation**, **cancellation**, and **completion**.
-**Swagger UI is integrated** for easy API testing and documentation.
+The project follows a clean layered architecture using Controller, Service, Repository, DTO, and Transformer layers to ensure maintainability, scalability, and readability. Centralized exception handling provides consistent and structured error responses. Swagger UI is integrated for interactive API documentation and testing. The system also implements essential security features such as password encryption (BCrypt), login/logout mechanisms, change password and forgot password flows, along with status-based entity management (ACTIVE, INACTIVE, CONFIRMATION, COMPLETED, CANCELLED, etc.), reflecting real-world cab booking workflows.
 
 **This project is suitable for demonstrating real-world backend development concepts such as:**
-
-- REST API design
-- Entity–DTO transformation
-- Status based filtering
-- Exception handling globally
-- Role based operations (Admin, Driver, Customer)
-
-## 🚀 Features
-
-### ✔ 👤 Customer Management
-
-- Customer registration
-- Update customer profile
-- Fetch customer details
-- Search customers by different criteria
-- View customer bookings (all, active, completed, cancelled)
-
-### ✔ 🚗 Driver Management
-
-- Driver registration
-- Update driver details
-- Fetch driver details
-- Search drivers
-- View driver bookings (all, in-progress, completed, cancelled)
-
-### ✔ 🚕 Cab Management
-
-- Register cab for a driver
-- Update cab details
-- Fetch available cabs for booking
-- View all cabs (active, inactive, available, unavailable)
-- Search cabs by different parameters
-
-### ✔ 📖 Booking Management
-
-- Create new booking by customer
-- Update booking details
-- Cancel booking by customer
-- Complete booking by driver
-- Fetch bookings by customer
-- Fetch bookings by driver
-- Fetch bookings by status (active, completed, cancelled)
-
-### ✔ 🛡️ Admin Panel Features
-
-- Activate / deactivate drivers
-- Activate / deactivate customers
-- View all drivers (active & inactive)
-- View all customers (active & inactive)
-- View all cabs (active, inactive, available, unavailable)
-- View all bookings
-- Filter bookings by driver or customer
-- Filter bookings by status (active, completed, cancelled)
-- Search drivers, customers, cabs and bookings
-
-### ✔ 📧 Email Notification System
-
-- Send email on booking confirmation
-- Send email on booking completion
-- Send email on booking cancellation
 
 ### ✔ ⚙️ Technical Features
 
 - RESTful API design
 - DTO based architecture
 - Entity to DTO transformation
+- Spring Security integration
+- Role based authorization (Admin, Driver, Customer)  
+- Ownership security (user can access only his own data)
+- Validation annotations
+- Service layer separation
+- Interface-based services  
 - Global exception handling
 - Status-based filtering using Enums
 - Clean layered architecture (Controller, Service, Repository, Model)
 - Swagger UI for API documentation
 
+### 📧 Email Notification System
+
+The application sends email notifications to customers for:
+
+- Booking Confirmation
+
+- Booking Completion
+
+- Booking Cancellation
+
+Email templates are generated dynamically based on booking status.   
+
+
+## 🛡️ Security Model (Role Security Rules)
+
+| Role     | Access                                |
+| -------- | ------------------------------------- |
+| CUSTOMER | Own profile, own bookings, cab search |
+| DRIVER   | Own profile, assigned bookings, cab qureries    |
+| ADMIN    | Full system access                    |
+
+✔ Ownership security is applied using logged-in user identity  
+✔ No user can access another user's data  
+✔ /me APIs are used instead of {id}  
+
+## 🔒 Ownership Security
+
+Every customer or driver API uses the logged-in user’s Principal email to fetch only that user’s own data.  
+
+This ensures:  
+✔ Prevents ID tampering  
+✔ Only owners see their own bookings  
+✔ Admin has privileged access  
+
+- All protected APIs require session authentication.  
+
+## 🚀 Features of EasyTrip-Backend Application
+
+### 🔐 App Users (Authentication & Security)
+
+✔ Signup with Role (Customer / Driver only)   
+✔ Login User  
+✔ Logout User  
+✔ Change Password  
+✔ BCrypt password encryption  
+✔ Role based access (ADMIN / DRIVER / CUSTOMER)  
+✔ Profile status check (ACTIVE / INACTIVE)  
+✔ Ownership based security (user can access only own data)  
+
+### 👤 Customer Dashboard
+
+**🧾 Customer Profile**
+
+✔ Create customer profile  
+✔ View own profile  
+✔ Update profile  
+✔ Deactivate (inactive) profile  
+
+**📖 Customer Booking Window**
+
+✔ View all bookings  
+✔ View active booking  
+✔ View completed bookings  
+✔ View cancelled bookings  
+✔ Book cab  
+✔ Update booking  
+✔ Cancel booking  
+
+**🚕 Cab Availability**
+
+✔ Check available cabs  
+
+### 🚗 Driver Dashboard
+
+**👤 Driver Profile**
+
+✔ Create driver profile  
+✔ View own profile  
+✔ Update profile  
+✔ Deactivate (inactive) profile  
+
+**📖 Driver Booking Window**
+
+✔ View all assigned bookings  
+✔ View active booking  
+✔ View completed bookings  
+✔ View cancelled bookings  
+✔ Complete booking (trip end)  
+
+**🚕 Driver Cab Queries**
+
+✔ Register cab  
+✔ Update cab details  
+✔ Get own cab details  
+
+### 🛡️ Admin Dashboard
+
+**👥 Customer Management**
+
+✔ View all customers  
+✔ View active customers  
+✔ View inactive customers  
+✔ Find customer by ID  
+✔ Search customers by gender & age  
+✔ Search customers by age greater than  
+✔ Activate customer profile  
+✔ Inactivate customer profile  
+
+**🚗 Driver Management**
+
+✔ View all drivers  
+✔ View active drivers  
+✔ View inactive drivers  
+✔ Find driver by ID  
+✔ Activate driver profile  
+✔ Inactivate driver profile  
+
+**🚕 Cab Management**
+
+✔ View all listed cabs  
+✔ View active cabs  
+✔ View inactive cabs  
+✔ View available cabs  
+✔ View unavailable cabs  
+✔ Find cab by ID  
+
+**📖 Booking Management**
+
+✔ View all bookings  
+✔ Find booking by ID  
+✔ Get bookings by customer  
+✔ Get bookings by driver  
+✔ View active bookings  
+✔ View completed bookings  
+✔ View cancelled bookings  
+
 ## 🛠 Tech Stack
 
 - **Java**  
-- **Spring Boot**  
-- **Spring MVC / Spring Data JPA**  
+- **Spring Boot**
+- **Spring Security**  
+- **Spring MVC**
+- **Spring Data JPA**  
 - **Hibernate ORM**  
 - **MySQL Database / H2 (optional)**  
 - **JavaMailSender (email)**
 - **RESTful APIs**
 - **Maven**
 - **Lombok**
-- **Postman / Swagger (for testing)**
+- **Postman / Swagger (for testing)**  
 
 ## 📂 Project Structure
 
@@ -111,6 +190,7 @@ easetrip
 │   ├── main
 │   │   ├── java
 │   │   │   └── com.sajidtech.easytrip
+│   │   │       ├── config
 │   │   │       ├── controller
 │   │   │       ├── dto
 │   │   │       ├── emails
@@ -118,6 +198,7 @@ easetrip
 │   │   │       ├── exception
 │   │   │       ├── model
 │   │   │       ├── repository
+│   │   │       ├── security
 │   │   │       ├── service
 │   │   │       ├── transformer
 │   │   │       └── EasytripApplication.java
@@ -138,58 +219,6 @@ easetrip
 ├── mvnw.cmd
 └── pom.xml
 ```````
-## 📂 Package Description
-
-### 🔹 controller
-Contains all REST APIs.
-Handles incoming HTTP requests and sends responses.
-
-### 🔹 dto
-Data Transfer Objects used to transfer data between client and server.
-Used for request and response payloads.
-
-### 🔹 emails
-Contains email templates and email related logic (booking confirmation, cancellation, etc.).
-
-### 🔹 enums
-Contains all enums like:
-BookingStatus, UserRole, PaymentStatus, etc.
-
-### 🔹 exception
-Custom exception classes and global exception handling logic.
-
-### 🔹 model
-Contains all JPA entity classes which map with database tables.
-
-### 🔹 repository
-Contains Spring Data JPA repository interfaces for database operations.
-
-### 🔹 service
-Contains business logic of the application.
-
-### 🔹 transformer
-Used to convert Entity → DTO and DTO → Entity.
-
-## 📂 Resources Folder
-
-### 🔹 application.properties
-Contains database configuration and application settings.
-
-## ⚙️ Other Important Files
-### 🔹 pom.xml
-Maven configuration file containing dependencies and plugins.
-
-## 📧 Email Notification
-
-The application sends email notifications to customers for:
-
-- Booking Confirmation
-
-- Booking Completion
-
-- Booking Cancellation
-
-Email templates are generated dynamically based on booking status.
 
 ## 🗄 Database Configuration
 
@@ -239,113 +268,146 @@ spring.mail.properties.mail.smtp.starttls.enable=true
 
 Use Postman or Swagger UI to test APIs.
 
-## 👤 Customer APIs
+## 🔐 App Users (Auth APIs)
 
-| Method | Endpoint                                        | Description                                                                      |
-| ------ | ----------------------------------------------- | -------------------------------------------------------------------------------- |
-| PUT    | `/customers/customer/{id}/update`               | Update an existing customer’s details using customer ID.                         |
-| POST   | `/customers/register/customer`                  | Register a new customer in the system.                                           |
-| GET    | `/customers/search`                             | Search customers based on given parameters (e.g. gender, age, etc.).             |
-| GET    | `/customers/search/greater`                     | Search customers whose age is greater than a given value. (e.g. ?age=25)         |
-| GET    | `/customers/customer`                           | Get registered customer by id.                                                   |
-| GET    | `/customers/customer/{id}/bookings`             | Get all bookings of a specific customer.                                         |
-| GET    | `/customers/customer/{id}/bookings/in-progress` | Get all **in-progress bookings** of a specific customer.                         |
-| GET    | `/customers/customer/{id}/bookings/completed`   | Get all **completed bookings** of a specific customer.                           |
-| GET    | `/customers/customer/{id}/bookings/cancelled`   | Get all **cancelled bookings** of a specific customer.                           |
-| DELETE | `/customers/customer/{id}/delete`               | Delete a customer from the system using customer ID.                             |
+| Method | Endpoint                | Description                                    |
+| ------ | ----------------------- | ---------------------------------------------- |
+| POST   | `/auth/signup`          | Signup user with role (CUSTOMER / DRIVER only) |
+| POST   | `/auth/login`           | Login user                                     |
+| POST   | `/auth/logout`          | Logout current user                            |
+| PUT   | `/auth/change-password` | Change logged-in user password                 |
 
-## 🚗 Driver APIs
 
-| Method | Endpoint                                    | Description                                             |
-| ------ | ------------------------------------------- | ------------------------------------------------------- |
-| PUT    | `/drivers/driver/{id}/update`               | Update an existing driver’s details using driver ID.    |
-| POST   | `/drivers/register/driver`                  | Register a new driver in the system.                    |
-| GET    | `/drivers/driver`                           | Get registered drivers by its id (?id=6453).            |
-| GET    | `/drivers/driver/{id}/bookings`             | Get all bookings assigned to a specific driver.         |
-| GET    | `/drivers/driver/{id}/bookings/in-progress` | Get all **in-progress bookings** for a specific driver. |
-| GET    | `/drivers/driver/{id}/bookings/completed`   | Get all **completed bookings** for a specific driver.   |
-| GET    | `/drivers/driver/{id}/bookings/cancelled`   | Get all **cancelled bookings** for a specific driver.   |
-| DELETE | `/drivers/driver/{id}`                      | Delete a driver from the system using driver ID.        |
+## 👤 Customer Dashboard
 
-## 🚕 Cab APIs
+**🧾 Customer Profile**
 
-| Method | Endpoint                    | Description                                                       |
-| ------ | --------------------------- | ----------------------------------------------------------------- |
-| PUT    | `/cab/driver/{id}/update`   | Update cab details assigned to a specific driver using driver ID. |
-| POST   | `/cab/driver/{id}/register` | Register a new cab for a specific driver.                         |
-| GET    | `/cab/search/available`     | Get list of all available cabs for booking.                       |
+| Method | Endpoint                   | Description                    |
+| ------ | -------------------------- | ------------------------------ |
+| POST   | `/customer/create-profile` | Create customer profile        |
+| GET    | `/customer/me`             | Get logged-in customer profile |
+| PUT    | `/customer/me/update`      | Update customer profile        |
+| DELETE | `/customer/me`             | Deactivate customer profile    |
 
-## 📖 Booking APIs
 
-| Method | Endpoint                        | Description                                                |
-| ------ | ------------------------------- | ---------------------------------------------------------- |
-| PUT    | `/booking/driver/{id}/complete` | Mark a booking as **completed** by driver using driver ID. |
-| PUT    | `/booking/customer/{id}/update` | Update booking details by customer using booking ID.       |
-| PUT    | `/booking/customer/{id}/cancel` | Cancel an existing booking by customer using booking ID.   |
-| POST   | `/booking/customer/{id}/booked` | Create a new booking for a customer using customer ID.     |
+**📖 Customer Booking Windows**
 
-## 🛡️ Admin APIs
+| Method | Endpoint                      | Description                            |
+| ------ | ----------------------------- | -------------------------------------- |
+| GET    | `/booking/customer`           | Get all bookings of logged-in customer |
+| GET    | `/booking/customer/active`    | Get active booking                     |
+| GET    | `/booking/customer/completed` | Get completed bookings                 |
+| GET    | `/booking/customer/cancelled` | Get cancelled bookings                 |
+| POST   | `/booking/customer/booked`    | Book a cab                             |
+| PUT    | `/booking/customer/update`    | Update booking                         |
+| PUT    | `/booking/customer/cancel`    | Cancel booking                         |
 
-| Method | Endpoint                        | Description                                        |
-| ------ | ------------------------------- | -------------------------------------------------- |
-| PUT    | `/admin/driver/{id}/inactive`   | Mark a driver as **inactive** using driver ID.     |
-| PUT    | `/admin/driver/{id}/active`     | Mark a driver as **active** using driver ID.       |
-| PUT    | `/admin/customer/{id}/inactive` | Mark a customer as **inactive** using customer ID. |
-| PUT    | `/admin/customer/{id}/active`   | Mark a customer as **active** using customer ID.   |
 
-## 🛡️ Admin – Driver Fetch APIs
+**🚕 Cabs Availability**
 
-| Method | Endpoint                  | Description                                                          |
-| ------ | ------------------------- | -------------------------------------------------------------------- |
-| GET    | `/admin/drivers`          | Fetch list of **all drivers** (active + inactive).                   |
-| GET    | `/admin/drivers/inactive` | Fetch list of **all inactive drivers**.                              |
-| GET    | `/admin/drivers/active`   | Fetch list of **all active drivers**.                                |
-| GET    | `/admin/driver/search`    | Search drivers based on ID (?id=24521).                              |
+| Method | Endpoint         | Description            |
+| ------ | ---------------- | ---------------------- |
+| GET    | `/cab/available` | Get all available cabs |
 
-## 🛡️ Admin – Customer Fetch APIs
 
-| Method | Endpoint                    | Description                                                            |
-| ------ | --------------------------- | ---------------------------------------------------------------------- |
-| GET    | `/admin/customers`          | Fetch list of **all customers** (active + inactive).                   |
-| GET    | `/admin/customers/inactive` | Fetch list of **all inactive customers**.                              |
-| GET    | `/admin/customers/active`   | Fetch list of **all active customers**.                                |
-| GET    | `/admin/customer/search`    | Search customers based on ID (?id=264721).                             |
+## 🚗 Driver Dashboard
 
-## 🛡️ Admin – Cab Fetch APIs
+**👤 Driver Profile**
 
-| Method | Endpoint                  | Description                                                                   |
-| ------ | ------------------------- | ----------------------------------------------------------------------------- |
-| GET    | `/admin/cabs`             | Fetch list of **all cabs** (active, inactive, available, unavailable).        |
-| GET    | `/admin/cabs/unavailable` | Fetch list of **all unavailable cabs** (currently not available for booking). |
-| GET    | `/admin/cabs/inactive`    | Fetch list of **all inactive cabs**.                                          |
-| GET    | `/admin/cabs/available`   | Fetch list of **all available cabs** for booking.                             |
-| GET    | `/admin/cabs/active`      | Fetch list of **all active cabs**.                                            |
-| GET    | `/admin/cab/search`       | Search cabs based on ID (?id=163411).                                         |
+| Method | Endpoint            | Description                  |
+| ------ | ------------------- | ---------------------------- |
+| POST   | `/driver/register`  | Create driver profile        |
+| GET    | `/driver/me`        | Get logged-in driver profile |
+| PUT    | `/driver/me/update` | Update driver profile        |
+| DELETE | `/driver/me`        | Deactivate driver profile    |
 
-## 🛡️ Admin – Booking Fetch APIs
 
-| Method | Endpoint                   | Description                                                                           |
-| ------ | -------------------------- | ------------------------------------------------------------------------------------- |
-| GET    | `/admin/bookings`          | Fetch list of **all bookings** in the system.                                         |
-| GET    | `/admin/bookings/driver`   | Fetch bookings filtered by **driver**.                                                |
-| GET    | `/admin/bookings/customer` | Fetch bookings filtered by **customer**.                                              |
-| GET    | `/admin/bookings/complete` | Fetch list of **completed bookings**.                                                 |
-| GET    | `/admin/bookings/cancel`   | Fetch list of **cancelled bookings**.                                                 |
-| GET    | `/admin/bookings/active`   | Fetch list of **active (in-progress) bookings**.                                      |
-| GET    | `/admin/booking/search`    | Search bookings based on given parameters (booking id).                               |
+**📖 Driver Booking Windows**
+
+| Method | Endpoint                    | Description                         |
+| ------ | --------------------------- | ----------------------------------- |
+| GET    | `/booking/driver`           | Get all bookings assigned to driver |
+| GET    | `/booking/driver/active`    | Get active booking                  |
+| GET    | `/booking/driver/completed` | Get completed bookings              |
+| GET    | `/booking/driver/cancelled` | Get cancelled bookings              |
+| PUT    | `/booking/driver/complete`  | Complete booking (trip finished)    |
+
+
+**🚕 Driver Cab Queries**
+
+| Method | Endpoint               | Description         |
+| ------ | ---------------------- | ------------------- |
+| POST   | `/cab/driver/register` | Register cab        |
+| PUT    | `/cab/driver/update`   | Update cab details  |
+| GET    | `/cab/driver`       | Get own cab details |
+
+
+## 🛡️ Admin Dashboard APIs
+
+**🛡️ Admin – Customer Fetch APIs**
+
+| Method | Endpoint                          | Description                          |
+| ------ | --------------------------------- | ------------------------------------ |
+| GET    | `/admin/customers`                | Get all customers                    |
+| GET    | `/admin/customers/active`         | Get active customers                 |
+| GET    | `/admin/customers/inactive`       | Get inactive customers               |
+| GET    | `/admin/customer/search`          | Search customer by id                |
+| GET    | `/admin/customers/search`         | Search customers by gender & age     |
+| GET    | `/admin/customers/search/greater` | Search customers by age greater than |
+| PUT    | `/admin/customer/{id}/active`     | Activate customer                    |
+| PUT    | `/admin/customer/{id}/inactive`   | Inactivate customer                  |
+
+
+**🛡️ Admin – Driver Fetch APIs**
+
+| Method | Endpoint                      | Description          |
+| ------ | ----------------------------- | -------------------- |
+| GET    | `/admin/drivers`              | Get all drivers      |
+| GET    | `/admin/drivers/active`       | Get active drivers   |
+| GET    | `/admin/drivers/inactive`     | Get inactive drivers |
+| GET    | `/admin/driver/search`        | Search driver by id  |
+| PUT    | `/admin/driver/{id}/active`   | Activate driver      |
+| PUT    | `/admin/driver/{id}/inactive` | Inactivate driver    |
+
+
+**🛡️ Admin – Cab Fetch APIs**
+
+| Method | Endpoint                  | Description          |
+| ------ | ------------------------- | -------------------- |
+| GET    | `/admin/cabs`             | Get all cabs         |
+| GET    | `/admin/cabs/active`      | Get active cabs      |
+| GET    | `/admin/cabs/inactive`    | Get inactive cabs    |
+| GET    | `/admin/cabs/available`   | Get available cabs   |
+| GET    | `/admin/cabs/unavailable` | Get unavailable cabs |
+| GET    | `/admin/cab/search`       | Search cab by id     |
+
+
+**🛡️ Admin – Booking Fetch APIs**
+
+| Method | Endpoint                   | Description              |
+| ------ | -------------------------- | ------------------------ |
+| GET    | `/admin/bookings`          | Get all bookings         |
+| GET    | `/admin/bookings/active`   | Get active bookings      |
+| GET    | `/admin/bookings/complete` | Get completed bookings   |
+| GET    | `/admin/bookings/cancel`   | Get cancelled bookings   |
+| GET    | `/admin/bookings/driver`   | Get bookings by driver   |
+| GET    | `/admin/bookings/customer` | Get bookings by customer |
+| GET    | `/admin/booking/search`    | Search booking by id     |
 
 
 ## 📈 Future Enhancements
 
 **✔ JWT Authentication**
 
-**✔ Swagger Documentation**
+**✔ Swagger Documentation**  
+
+**✔ Ride Tracking**
+
+**✔ Rating System**  
 
 **✔ Payment Gateway Integration**
 
-**✔ Spring Security**
-
-**✔ Frontend (Angular/React)**
+**✔ Frontend (React)**
 
 ## 👨‍💻 Developer
 
