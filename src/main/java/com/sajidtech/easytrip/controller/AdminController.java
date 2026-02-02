@@ -23,8 +23,11 @@ public class AdminController {
 
     // Get all customers
     @GetMapping("/customers")
-    public ResponseEntity<ApiResponse<List<CustomerResponse>>> getAllCustomer(){
-       List<CustomerResponse> responseList = this.adminService.getAllCustomer();
+    public ResponseEntity<ApiResponse<PageResponse<CustomerResponse>>> getAllCustomer(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ){
+        PageResponse<CustomerResponse> responseList = this.adminService.getAllCustomer(page, size);
        return ResponseEntity.ok(ApiResponse.success("Customers fetched",responseList));
     }
 
@@ -37,29 +40,43 @@ public class AdminController {
 
     // Search by gender and age
     @GetMapping("/customers/search")
-    public ResponseEntity<ApiResponse<List<CustomerResponse>>> getAllByGenderAndAge(@RequestParam("gender") Gender gender,
-                                                                                    @RequestParam("age") int age){
-        List<CustomerResponse> responses = this.adminService.getAllByGenderAndAge(gender, age);
+    public ResponseEntity<ApiResponse<PageResponse<CustomerResponse>>> getAllByGenderAndAge(
+            @RequestParam("gender") Gender gender,
+            @RequestParam("age") int age,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ){
+        PageResponse<CustomerResponse> responses = this.adminService.getAllByGenderAndAge(gender, age, page, size);
         return ResponseEntity.ok(ApiResponse.success("Customers fetched", responses));
     }
 
     // Get customers above age
     @GetMapping("/customers/search/greater")
-    public ResponseEntity<ApiResponse<List<CustomerResponse>>> getAllGreaterThenAge(@RequestParam("age") int age){
-        List<CustomerResponse> responses = this.adminService.getAllGreaterThenAge(age);
+    public ResponseEntity<ApiResponse<PageResponse<CustomerResponse>>> getAllGreaterThenAge(
+            @RequestParam("age") int age,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ){
+        PageResponse<CustomerResponse> responses = this.adminService.getAllGreaterThenAge(age, page, size);
         return ResponseEntity.ok(ApiResponse.success("Filtered customers", responses));
     }
     // Get active customers
     @GetMapping("/customers/active")
-    public ResponseEntity<ApiResponse<List<CustomerResponse>>> getActiveCustomers(){
-        List<CustomerResponse> responseList = this.adminService.getActiveCustomers();
+    public ResponseEntity<ApiResponse<PageResponse<CustomerResponse>>> getActiveCustomers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ){
+        PageResponse<CustomerResponse> responseList = this.adminService.getActiveCustomers(page, size);
         return ResponseEntity.ok(ApiResponse.success("Active customers",responseList));
     }
 
     // Get inactive customers
     @GetMapping("/customers/inactive")
-    public ResponseEntity<ApiResponse<List<CustomerResponse>>> getInactiveCustomers(){
-        List<CustomerResponse> responseList = this.adminService.getInactiveCustomers();
+    public ResponseEntity<ApiResponse<PageResponse<CustomerResponse>>> getInactiveCustomers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ){
+        PageResponse<CustomerResponse> responseList = this.adminService.getInactiveCustomers(page, size);
         return ResponseEntity.ok(ApiResponse.success("Inactive customers", responseList));
     }
 
@@ -79,8 +96,11 @@ public class AdminController {
 
 
     @GetMapping("/drivers")
-    public ResponseEntity<ApiResponse<List<DriverResponse>>> getAllDrivers(){
-        List<DriverResponse> responseList = this.adminService.getAllDrivers();
+    public ResponseEntity<ApiResponse<PageResponse<DriverResponse>>> getAllDrivers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ){
+        PageResponse<DriverResponse> responseList = this.adminService.getAllDrivers(page, size);
         return ResponseEntity.ok(ApiResponse.success("Registered Drivers", responseList));
     }
 
@@ -91,14 +111,20 @@ public class AdminController {
     }
 
     @GetMapping("/drivers/active")
-    public ResponseEntity<ApiResponse<List<DriverResponse>>> getActiveDrivers(){
-        List<DriverResponse> responseList = this.adminService.getActiveDrivers();
+    public ResponseEntity<ApiResponse<PageResponse<DriverResponse>>> getActiveDrivers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ){
+        PageResponse<DriverResponse> responseList = this.adminService.getActiveDrivers(page, size);
         return ResponseEntity.ok(ApiResponse.success("Active Drivers", responseList));
     }
 
     @GetMapping("/drivers/inactive")
-    public ResponseEntity<ApiResponse<List<DriverResponse>>> getInactiveDrivers(){
-        List<DriverResponse> responseList = this.adminService.getInactiveDrivers();
+    public ResponseEntity<ApiResponse<PageResponse<DriverResponse>>> getInactiveDrivers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ){
+        PageResponse<DriverResponse> responseList = this.adminService.getInactiveDrivers(page, size);
         return ResponseEntity.ok(ApiResponse.success("Inactive Drivers", responseList));
     }
 
@@ -119,8 +145,11 @@ public class AdminController {
 
 
     @GetMapping("/cabs")
-    public ResponseEntity<ApiResponse<List<CabResponse>>> getAllCabs(){
-        List<CabResponse> responseList = this.adminService.getAllCabs();
+    public ResponseEntity<ApiResponse<PageResponse<CabResponse>>> getAllCabs(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ){
+        PageResponse<CabResponse> responseList = this.adminService.getAllCabs(page, size);
         return ResponseEntity.ok(ApiResponse.success("Registered Cabs", responseList));
     }
 
@@ -131,26 +160,38 @@ public class AdminController {
     }
 
     @GetMapping("/cabs/active")
-    public ResponseEntity<ApiResponse<List<CabResponse>>> getActiveCabs(){
-        List<CabResponse> responseList = this.adminService.getActiveCabs();
+    public ResponseEntity<ApiResponse<PageResponse<CabResponse>>> getActiveCabs(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ){
+        PageResponse<CabResponse> responseList = this.adminService.getActiveCabs(page, size);
         return ResponseEntity.ok(ApiResponse.success("Active Cabs",responseList));
     }
 
     @GetMapping("/cabs/inactive")
-    public ResponseEntity<ApiResponse<List<CabResponse>>> getInactiveCabs(){
-        List<CabResponse> responseList = this.adminService.getInactiveCabs();
+    public ResponseEntity<ApiResponse<PageResponse<CabResponse>>> getInactiveCabs(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ){
+        PageResponse<CabResponse> responseList = this.adminService.getInactiveCabs(page, size);
         return ResponseEntity.ok(ApiResponse.success("Inactive Cabs", responseList));
     }
 
     @GetMapping("/cabs/available")
-    public ResponseEntity<ApiResponse<List<CabResponse>>> getAvailableCabs(){
-        List<CabResponse> responseList = this.adminService.getAvailableCabs();
+    public ResponseEntity<ApiResponse<PageResponse<CabResponse>>> getAvailableCabs(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ){
+        PageResponse<CabResponse> responseList = this.adminService.getAvailableCabs(page, size);
         return ResponseEntity.ok(ApiResponse.success("Available Cabs", responseList));
     }
 
     @GetMapping("/cabs/unavailable")
-    public ResponseEntity<ApiResponse<List<CabResponse>>> getUnavailableCabs(){
-        List<CabResponse> responseList = this.adminService.getUnavailableCabs();
+    public ResponseEntity<ApiResponse<PageResponse<CabResponse>>> getUnavailableCabs(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ){
+        PageResponse<CabResponse> responseList = this.adminService.getUnavailableCabs(page, size);
         return ResponseEntity.ok(ApiResponse.success("Unavailable Cabs", responseList));
     }
 
@@ -159,8 +200,11 @@ public class AdminController {
 
 
     @GetMapping("/bookings")
-    public ResponseEntity<ApiResponse<List<BookingResponse>>> getAllBookings(){
-        List<BookingResponse> responseList = this.adminService.getAllBookings();
+    public ResponseEntity<ApiResponse<PageResponse<BookingResponse>>> getAllBookings(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ){
+        PageResponse<BookingResponse> responseList = this.adminService.getAllBookings(page, size);
         return ResponseEntity.ok(ApiResponse.success("Bookings fetched", responseList));
     }
 
@@ -171,32 +215,49 @@ public class AdminController {
     }
 
     @GetMapping("/bookings/customer")
-    public ResponseEntity<ApiResponse<List<BookingResponse>>> getBookingsByCustomer(@RequestParam("id") int customerId){
-        List<BookingResponse> responseList = this.adminService.getBookingsByCustomer(customerId);
+    public ResponseEntity<ApiResponse<PageResponse<BookingResponse>>> getBookingsByCustomer(
+            @RequestParam("id") int customerId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ){
+        PageResponse<BookingResponse> responseList = this.adminService.getBookingsByCustomer(customerId, page, size);
         return ResponseEntity.ok(ApiResponse.success("Customers Bookings", responseList));
     }
 
     @GetMapping("/bookings/driver")
-    public ResponseEntity<ApiResponse<List<BookingResponse>>> getBookingsByDriver(@RequestParam("id") int driverId){
-        List<BookingResponse> responseList = this.adminService.getBookingsByDriver(driverId);
+    public ResponseEntity<ApiResponse<PageResponse<BookingResponse>>> getBookingsByDriver(
+            @RequestParam("id") int driverId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ){
+        PageResponse<BookingResponse> responseList = this.adminService.getBookingsByDriver(driverId, page, size);
         return ResponseEntity.ok(ApiResponse.success("Driver Bookings", responseList));
     }
 
     @GetMapping("/bookings/active")
-    public ResponseEntity<ApiResponse<List<BookingResponse>>> getActiveBookings(){
-        List<BookingResponse> responseList = this.adminService.getActiveBookings();
+    public ResponseEntity<ApiResponse<PageResponse<BookingResponse>>> getActiveBookings(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ){
+        PageResponse<BookingResponse> responseList = this.adminService.getActiveBookings(page, size);
         return ResponseEntity.ok(ApiResponse.success("Active Bookings", responseList));
     }
 
     @GetMapping("/bookings/complete")
-    public ResponseEntity<ApiResponse<List<BookingResponse>>> getCompletedBookings(){
-        List<BookingResponse> responseList = this.adminService.getCompletedBookings();
+    public ResponseEntity<ApiResponse<PageResponse<BookingResponse>>> getCompletedBookings(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ){
+        PageResponse<BookingResponse> responseList = this.adminService.getCompletedBookings(page, size);
         return ResponseEntity.ok(ApiResponse.success("Completed Bookings", responseList));
     }
 
     @GetMapping("/bookings/cancel")
-    public ResponseEntity<ApiResponse<List<BookingResponse>>> getCancelledBookings(){
-        List<BookingResponse> responseList = this.adminService.getCancelledBookings();
+    public ResponseEntity<ApiResponse<PageResponse<BookingResponse>>> getCancelledBookings(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ){
+        PageResponse<BookingResponse> responseList = this.adminService.getCancelledBookings(page, size);
         return ResponseEntity.ok(ApiResponse.success("Cancelled Bookings", responseList));
     }
 }

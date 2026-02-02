@@ -3,39 +3,28 @@ package com.sajidtech.easytrip.service.impl;
 import com.sajidtech.easytrip.enums.Status;
 import com.sajidtech.easytrip.enums.TripStatus;
 import com.sajidtech.easytrip.dto.request.DriverRequest;
-import com.sajidtech.easytrip.dto.response.BookingResponse;
 import com.sajidtech.easytrip.dto.response.DriverResponse;
-import com.sajidtech.easytrip.exception.BookingNotFoundException;
 import com.sajidtech.easytrip.exception.DriverNotFoundException;
 import com.sajidtech.easytrip.model.*;
-import com.sajidtech.easytrip.repository.CustomerRepository;
 import com.sajidtech.easytrip.repository.DriverRepository;
 import com.sajidtech.easytrip.repository.UserRepository;
 import com.sajidtech.easytrip.service.DriverService;
-import com.sajidtech.easytrip.transformer.BookingTransformer;
 import com.sajidtech.easytrip.transformer.DriverTransformer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.security.Principal;
-import java.util.List;
-import java.util.stream.Collectors;
-
 @Service
-@Transactional
 public class DriverServiceImpl implements DriverService {
 
     @Autowired
     private DriverRepository driverRepository;
 
     @Autowired
-    private CustomerRepository customerRepository;
-
-    @Autowired
     private UserRepository userRepository;
 
+    @Transactional
     public DriverResponse createProfile(DriverRequest driverRequest, String email) {
         User user = this.userRepository.findByEmail(email)
                 .orElseThrow(()-> new UsernameNotFoundException("User not found"));
@@ -46,7 +35,7 @@ public class DriverServiceImpl implements DriverService {
 
         driver.setEmail(email);
         driver.setUser(user);
-        Driver savedDriver = driverRepository.save(driver);
+        Driver savedDriver = this.driverRepository.save(driver);
         return DriverTransformer.driverToDriverResponse(savedDriver);
     }
 
@@ -64,6 +53,7 @@ public class DriverServiceImpl implements DriverService {
         this.driverRepository.save(driver);
     }
 
+    @Transactional
     public void profileInactive(String email) {
         Driver driver = checkValidDriver(email);
         boolean hasActiveBooking = driver.getBooking().stream()

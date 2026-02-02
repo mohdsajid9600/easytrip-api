@@ -1,8 +1,9 @@
 package com.sajidtech.easytrip.service.impl;
 
 import com.sajidtech.easytrip.dto.response.BookingResponse;
+import com.sajidtech.easytrip.dto.response.PageResponse;
 import com.sajidtech.easytrip.emails.EmailService;
-import com.sajidtech.easytrip.emails.EmailTemplate;
+import com.sajidtech.easytrip.emails.CustomerEmailFormate;
 import com.sajidtech.easytrip.enums.Status;
 import com.sajidtech.easytrip.enums.TripStatus;
 import com.sajidtech.easytrip.exception.BookingNotFoundException;
@@ -10,16 +11,21 @@ import com.sajidtech.easytrip.exception.DriverNotFoundException;
 import com.sajidtech.easytrip.model.Booking;
 import com.sajidtech.easytrip.model.Customer;
 import com.sajidtech.easytrip.model.Driver;
+import com.sajidtech.easytrip.repository.BookingRepository;
 import com.sajidtech.easytrip.repository.CustomerRepository;
 import com.sajidtech.easytrip.repository.DriverRepository;
 import com.sajidtech.easytrip.service.DriverBookingService;
 import com.sajidtech.easytrip.transformer.BookingTransformer;
+import com.sajidtech.easytrip.transformer.PageTransformer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class DriverBookingServiceImpl implements DriverBookingService {
@@ -31,25 +37,47 @@ public class DriverBookingServiceImpl implements DriverBookingService {
     private DriverRepository driverRepository;
 
     @Autowired
+    private BookingRepository bookingRepository;
+
+    @Autowired
     private JavaMailSender javaMailSender;
 
-    public List<BookingResponse> getAllBookings(String email) {
+    public PageResponse<BookingResponse> getAllBookings(int page, int size, String email) {
+        Pageable pageable = PageRequest.of(page, size);
         Driver driver = checkValidDriver(email);
-        return driver.getBooking().stream().map(booking -> getBookingResponseByBooking(booking, driver)).toList();
+        Page<Booking> bookingPage =
+                bookingRepository.findBookingsByDriver(driver, pageable);
+
+        List<BookingResponse> bookingResponseList = bookingPage.getContent().stream()
+                .map(booking -> getBookingResponseByBooking(booking, driver)).toList();
+
+        return PageTransformer.pageToPageResponse(bookingPage, bookingResponseList);
     }
 
-    public List<BookingResponse> getAllCompletedBookings(String email) {
+    public PageResponse<BookingResponse> getAllCompletedBookings(int page, int size, String email) {
+        Pageable pageable = PageRequest.of(page, size);
         Driver driver = checkValidDriver(email);
-        return driver.getBooking().stream()
+        Page<Booking> bookingPage =
+                bookingRepository.findBookingsByDriver(driver, pageable);
+
+        List<BookingResponse> bookingResponseList = bookingPage.getContent().stream()
                 .filter(booking-> booking.getTripStatus().equals(TripStatus.COMPLETED))
-                .map(booking-> getBookingResponseByBooking(booking, driver)).collect(Collectors.toList());
+                .map(booking-> getBookingResponseByBooking(booking, driver)).toList();
+
+        return PageTransformer.pageToPageResponse(bookingPage, bookingResponseList);
     }
 
-    public List<BookingResponse> getAllCancelledBookings(String email) {
+    public PageResponse<BookingResponse> getAllCancelledBookings(int page, int size, String email) {
+        Pageable pageable = PageRequest.of(page, size);
         Driver driver = checkValidDriver(email);
-        return driver.getBooking().stream()
+        Page<Booking> bookingPage =
+                bookingRepository.findBookingsByDriver(driver, pageable);
+
+        List<BookingResponse> bookingResponseList = bookingPage.getContent().stream()
                 .filter(booking-> booking.getTripStatus().equals(TripStatus.CANCELLED))
-                .map(booking -> getBookingResponseByBooking(booking, driver)).collect(Collectors.toList());
+                .map(booking -> getBookingResponseByBooking(booking, driver)).toList();
+
+        return PageTransformer.pageToPageResponse(bookingPage, bookingResponseList);
     }
 
     public BookingResponse getProgressBookings(String email) {
@@ -60,17 +88,18 @@ public class DriverBookingServiceImpl implements DriverBookingService {
         return getBookingResponseByBooking(progressBooking, driver);
     }
 
+    @Transactional
     public void completeBookingByDriver(String email) {
         Driver driver = checkValidDriver(email);
         Booking booking = driverGetActiveBooking(driver);
-        Customer customer = customerRepository.findCustomerByBookingId(booking.getBookingId());
+        Customer customer = this.customerRepository.findCustomerByBookingId(booking.getBookingId());
 
         booking.setTripStatus(TripStatus.COMPLETED);
         driver.getCab().setAvailable(true);
-        driverRepository.save(driver);
+        this.driverRepository.save(driver);
         BookingResponse bookingResponse = BookingTransformer.bookingToBookingResponse(booking,driver.getCab(),driver,customer);
         //  EmailSender to the customer who ever booked the cab
-//        EmailService.sendEmailToCustomer(EmailTemplate.getSubject(TripStatus.COMPLETED), bookingResponse, TripStatus.COMPLETED);
+//        EmailService.sendEmailToCustomer(CustomerEmailFormate.getSubject(TripStatus.COMPLETED), bookingResponse, TripStatus.COMPLETED);
     }
 
     private Booking driverGetActiveBooking(Driver driver) {

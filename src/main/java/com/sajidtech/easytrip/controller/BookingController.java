@@ -3,6 +3,7 @@ package com.sajidtech.easytrip.controller;
 import com.sajidtech.easytrip.dto.request.BookingRequest;
 import com.sajidtech.easytrip.dto.response.ApiResponse;
 import com.sajidtech.easytrip.dto.response.BookingResponse;
+import com.sajidtech.easytrip.dto.response.PageResponse;
 import com.sajidtech.easytrip.service.CustomerBookingService;
 import com.sajidtech.easytrip.service.DriverBookingService;
 import jakarta.validation.Valid;
@@ -36,22 +37,31 @@ public class BookingController {
 
     // Get all bookings of customer
     @GetMapping("/customer")
-    public ResponseEntity<ApiResponse<List<BookingResponse>>> customerBookings(Principal principal){
-        List<BookingResponse> responses = this.customerBookingService.getAllBookings(principal.getName());
+    public ResponseEntity<ApiResponse<PageResponse<BookingResponse>>> customerBookings(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            Principal principal){
+        PageResponse<BookingResponse> responses = this.customerBookingService.getAllBookings(page, size, principal.getName());
         return ResponseEntity.ok(ApiResponse.success("Bookings fetched", responses));
     }
 
     // Get completed bookings
     @GetMapping("/customer/completed")
-    public ResponseEntity<ApiResponse<List<BookingResponse>>> customerCompletedBookings(Principal principal){
-        List<BookingResponse> responses = this.customerBookingService.getAllCompletedBookings(principal.getName());
+    public ResponseEntity<ApiResponse<PageResponse<BookingResponse>>> customerCompletedBookings(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            Principal principal){
+        PageResponse<BookingResponse> responses = this.customerBookingService.getAllCompletedBookings(page, size, principal.getName());
         return ResponseEntity.ok(ApiResponse.success("Completed bookings", responses));
     }
 
     // Get cancelled bookings
     @GetMapping("/customer/cancelled")
-    public ResponseEntity<ApiResponse<List<BookingResponse>>> customerCancelledBookings(Principal principal){
-        List<BookingResponse> responses = this.customerBookingService.getAllCancelledBookings(principal.getName());
+    public ResponseEntity<ApiResponse<PageResponse<BookingResponse>>> customerCancelledBookings(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            Principal principal){
+        PageResponse<BookingResponse> responses = this.customerBookingService.getAllCancelledBookings(page, size, principal.getName());
         return ResponseEntity.ok(ApiResponse.success("Cancelled bookings", responses));
     }
 
@@ -81,22 +91,31 @@ public class BookingController {
 
     // Get all driver bookings
     @GetMapping("/driver")
-    public ResponseEntity<ApiResponse<List<BookingResponse>>> driverBookingsList(Principal principal){
-        List<BookingResponse> responses = this.driverBookingService.getAllBookings(principal.getName());
+    public ResponseEntity<ApiResponse<PageResponse<BookingResponse>>> driverBookingsList(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            Principal principal){
+        PageResponse<BookingResponse> responses = this.driverBookingService.getAllBookings(page, size, principal.getName());
         return ResponseEntity.ok(ApiResponse.success("Bookings fetched", responses));
     }
 
     // Get completed bookings
     @GetMapping("/driver/completed")
-    public ResponseEntity<ApiResponse<List<BookingResponse>>> driverCompletedBookingsList(Principal principal){
-        List<BookingResponse> responses = this.driverBookingService.getAllCompletedBookings(principal.getName());
+    public ResponseEntity<ApiResponse<PageResponse<BookingResponse>>> driverCompletedBookingsList(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            Principal principal){
+        PageResponse<BookingResponse> responses = this.driverBookingService.getAllCompletedBookings(page, size, principal.getName());
         return ResponseEntity.ok(ApiResponse.success("Completed bookings", responses));
     }
 
     // Get cancelled bookings
     @GetMapping("/driver/cancelled")
-    public ResponseEntity<ApiResponse<List<BookingResponse>>> driverCancelledBookingsList(Principal principal){
-        List<BookingResponse> responses = this.driverBookingService.getAllCancelledBookings(principal.getName());
+    public ResponseEntity<ApiResponse<PageResponse<BookingResponse>>> driverCancelledBookingsList(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            Principal principal){
+        PageResponse<BookingResponse> responses = this.driverBookingService.getAllCancelledBookings(page, size, principal.getName());
         return ResponseEntity.ok(ApiResponse.success("Cancelled bookings", responses));
     }
 

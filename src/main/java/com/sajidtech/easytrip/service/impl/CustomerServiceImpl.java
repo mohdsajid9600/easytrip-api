@@ -21,6 +21,7 @@ import com.sajidtech.easytrip.transformer.CustomerTransformer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,12 +33,10 @@ public class CustomerServiceImpl implements CustomerService {
     private CustomerRepository customerRepository;
 
     @Autowired
-    private DriverRepository driverRepository;
-
-    @Autowired
     private UserRepository userRepository;
 
 
+    @Transactional
     public CustomerResponse createProfile(CustomerRequest customerRequest, String email) {
         User user = this.userRepository.findByEmail(email)
                 .orElseThrow(()-> new UsernameNotFoundException("User not found"));
@@ -63,9 +62,10 @@ public class CustomerServiceImpl implements CustomerService {
         customer.setAge(customerRequest.getAge());
         customer.setGender(customerRequest.getGender());
 
-        customerRepository.save(customer);
+        this.customerRepository.save(customer);
     }
 
+    @Transactional
     public void deactivateProfile(String email) {
         Customer customer = checkValidCustomer(email);
         boolean hasBooking = customer.getBooking().stream().anyMatch(b -> b.getTripStatus().equals(TripStatus.IN_PROGRESS));
@@ -74,12 +74,11 @@ public class CustomerServiceImpl implements CustomerService {
         }
         customer.setStatus(Status.INACTIVE);
         customer.getUser().setProfileStatus(Status.INACTIVE);
-        customerRepository.save(customer);
-
+        this.customerRepository.save(customer);
     }
 
     private Customer checkValidCustomer(String email) {
-        Customer customer = customerRepository.findByEmail(email)
+        Customer customer = this.customerRepository.findByEmail(email)
                 .orElseThrow(()-> new CustomerNotFoundException("Customer Not Found"));
         if(customer.getStatus() == Status.INACTIVE){
             throw new RuntimeException("Customer is inactive. Access denied");

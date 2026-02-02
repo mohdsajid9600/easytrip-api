@@ -1,16 +1,17 @@
 package com.sajidtech.easytrip.service;
 
 import com.sajidtech.easytrip.dto.response.BookingResponse;
+import com.sajidtech.easytrip.dto.response.PageResponse;
 
 import java.util.List;
 
 public interface BookingServiceQueries {
 
-    List<BookingResponse> getAllBookings(String email);
+    PageResponse<BookingResponse> getAllBookings(int page, int size, String email);
 
-    List<BookingResponse> getAllCompletedBookings(String email);
+    PageResponse<BookingResponse> getAllCompletedBookings(int page, int size, String email);
 
-    List<BookingResponse> getAllCancelledBookings(String email);
+    PageResponse<BookingResponse> getAllCancelledBookings(int page, int size, String email);
 
     BookingResponse getProgressBookings(String email);
 

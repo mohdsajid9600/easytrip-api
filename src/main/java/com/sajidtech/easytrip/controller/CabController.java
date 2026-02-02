@@ -3,9 +3,11 @@ package com.sajidtech.easytrip.controller;
 import com.sajidtech.easytrip.dto.request.CabRequest;
 import com.sajidtech.easytrip.dto.response.ApiResponse;
 import com.sajidtech.easytrip.dto.response.CabResponse;
+import com.sajidtech.easytrip.dto.response.PageResponse;
 import com.sajidtech.easytrip.service.CabService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -47,8 +49,11 @@ public class CabController {
     }
     // Get all available cabs
     @GetMapping("/available")
-    public ResponseEntity<ApiResponse<List<CabResponse>>> getAllAvailableCabs(){
-        List<CabResponse> responses = this.cabService.getAllAvailableCabs();
+    public ResponseEntity<ApiResponse<PageResponse<CabResponse>>> getAllAvailableCabs(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ){
+        PageResponse<CabResponse> responses = this.cabService.getAllAvailableCabs(page, size);
         return ResponseEntity.ok(ApiResponse.success("Available cabs", responses));
     }
 }

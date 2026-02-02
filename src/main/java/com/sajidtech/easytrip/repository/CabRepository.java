@@ -4,6 +4,8 @@ package com.sajidtech.easytrip.repository;
 import com.sajidtech.easytrip.enums.Status;
 import com.sajidtech.easytrip.model.Cab;
 import com.sajidtech.easytrip.model.Driver;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -19,14 +21,14 @@ public interface CabRepository extends JpaRepository<Cab, Integer> {
     Optional<Cab> getAvailableCab();
 
     @Query("select c from Cab c where c.available = true")
-    List<Cab> getAllAvailableCab();
+    Page<Cab> getAllAvailableCab(Pageable pageable);
 
     @Query("SELECT d FROM Driver d JOIN d.cab c WHERE c.cabId = :cabId")
     Driver getDriverByCabId(@Param("cabId") int cabId);
 
     @Query("select c from Cab c where c.status = :status")
-    List<Cab> findByStatus(@Param("status") Status status);
+    Page<Cab> findByStatus(@Param("status") Status status, Pageable pageable);
 
     @Query("select c from Cab c where c.available = false")
-    List<Cab> getUnavailableCab();
+    Page<Cab> getUnavailableCab(Pageable pageable);
 }

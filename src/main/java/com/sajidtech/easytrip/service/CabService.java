@@ -2,8 +2,8 @@ package com.sajidtech.easytrip.service;
 
 import com.sajidtech.easytrip.dto.request.CabRequest;
 import com.sajidtech.easytrip.dto.response.CabResponse;
-
-import java.util.List;
+import com.sajidtech.easytrip.dto.response.PageResponse;
+import org.springframework.data.domain.Page;
 
 public interface CabService {
 
@@ -11,7 +11,7 @@ public interface CabService {
 
     CabResponse updateCabByDriver(CabRequest cabRequest, String email);
 
-    List<CabResponse> getAllAvailableCabs();
+    PageResponse<CabResponse> getAllAvailableCabs(int page, int size);
 
     CabResponse getMuCab(String email);
 }

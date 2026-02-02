@@ -3,7 +3,7 @@ package com.sajidtech.easytrip.emails;
 import com.sajidtech.easytrip.enums.TripStatus;
 import com.sajidtech.easytrip.dto.response.BookingResponse;
 
-public class EmailTemplate {
+public class CustomerEmailFormate {
 
 
     public static String getEmailTemplate(TripStatus status,BookingResponse booking){

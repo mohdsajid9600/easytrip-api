@@ -1,5 +1,6 @@
 package com.sajidtech.easytrip.service.impl;
 
+import com.sajidtech.easytrip.dto.response.PageResponse;
 import com.sajidtech.easytrip.enums.Status;
 import com.sajidtech.easytrip.dto.request.CabRequest;
 import com.sajidtech.easytrip.dto.response.CabResponse;
@@ -11,8 +12,13 @@ import com.sajidtech.easytrip.repository.CabRepository;
 import com.sajidtech.easytrip.repository.DriverRepository;
 import com.sajidtech.easytrip.service.CabService;
 import com.sajidtech.easytrip.transformer.CabTransformer;
+import com.sajidtech.easytrip.transformer.PageTransformer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,7 +32,9 @@ public class CabServiceImpl implements CabService {
     @Autowired
     private DriverRepository driverRepository;
 
+
     @Override
+    @Transactional
     public CabResponse createCab(CabRequest cabRequest, String email) {
         Driver driver = checkExistenceOfDriver(email);
         if(driver.getCab() != null){
@@ -39,6 +47,7 @@ public class CabServiceImpl implements CabService {
     }
 
     @Override
+    @Transactional
     public CabResponse updateCabByDriver(CabRequest cabRequest, String email) {
         Driver driver = checkExistenceOfDriver(email);
         Cab cab = driver.getCab();
@@ -55,9 +64,12 @@ public class CabServiceImpl implements CabService {
     }
 
     @Override
-    public List<CabResponse> getAllAvailableCabs() {
-        List<Cab> availableCabs = this.cabRepository.getAllAvailableCab();
-        return availableCabs.stream().map(CabTransformer::cabToCabResponseForAvailable).collect(Collectors.toList());
+    public PageResponse<CabResponse> getAllAvailableCabs(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Cab> availableCabs = this.cabRepository.getAllAvailableCab(pageable);
+        List<CabResponse> cabResponses = availableCabs.stream().map(CabTransformer::cabToCabResponseForAvailable).toList();
+
+        return PageTransformer.pageToPageResponse(availableCabs, cabResponses);
     }
 
     @Override

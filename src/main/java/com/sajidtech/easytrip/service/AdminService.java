@@ -1,68 +1,65 @@
 package com.sajidtech.easytrip.service;
 
-import com.sajidtech.easytrip.dto.response.BookingResponse;
-import com.sajidtech.easytrip.dto.response.CabResponse;
-import com.sajidtech.easytrip.dto.response.CustomerResponse;
-import com.sajidtech.easytrip.dto.response.DriverResponse;
+import com.sajidtech.easytrip.dto.response.*;
 import com.sajidtech.easytrip.enums.Gender;
 
 import java.util.List;
 
 public interface AdminService {
 
-    List<CustomerResponse> getAllCustomer();
+    PageResponse<CustomerResponse> getAllCustomer(int page, int size);
 
     CustomerResponse getCustomerById(int customerId);
 
-    List<CustomerResponse> getAllByGenderAndAge(Gender gender, int age);
+    PageResponse<CustomerResponse> getAllByGenderAndAge(Gender gender, int age, int page, int size);
 
-    List<CustomerResponse> getAllGreaterThenAge(int age);
+    PageResponse<CustomerResponse> getAllGreaterThenAge(int age, int page, int size);
 
-    List<CustomerResponse> getActiveCustomers();
+    PageResponse<CustomerResponse> getActiveCustomers(int page, int size);
 
-    List<CustomerResponse> getInactiveCustomers();
+    PageResponse<CustomerResponse> getInactiveCustomers(int page, int size);
 
     CustomerResponse activeCustomer(int customerId);
 
     CustomerResponse inActiveCustomer(int customerId);
 
-    List<DriverResponse> getAllDrivers();
+    PageResponse<DriverResponse> getAllDrivers(int page, int size);
 
     DriverResponse getDriverById(int driverId);
 
-    List<DriverResponse> getActiveDrivers();
+    PageResponse<DriverResponse> getActiveDrivers(int page, int size);
 
-    List<DriverResponse> getInactiveDrivers();
+    PageResponse<DriverResponse> getInactiveDrivers(int page, int size);
 
     DriverResponse activeDriver(int driverId);
 
     DriverResponse inActiveDriver(int driverId);
 
-    List<CabResponse> getAllCabs();
+    PageResponse<CabResponse> getAllCabs(int page, int size);
 
     CabResponse getCabById(int cabId);
 
-    List<CabResponse> getActiveCabs();
+    PageResponse<CabResponse> getActiveCabs(int page, int size);
 
-    List<CabResponse> getInactiveCabs();
+    PageResponse<CabResponse> getInactiveCabs(int page, int size);
 
-    List<CabResponse> getAvailableCabs();
+    PageResponse<CabResponse> getAvailableCabs(int page, int size);
 
-    List<CabResponse> getUnavailableCabs();
+    PageResponse<CabResponse> getUnavailableCabs(int page, int size);
 
-    List<BookingResponse> getAllBookings();
+    PageResponse<BookingResponse> getAllBookings(int page, int size);
 
     BookingResponse getBookingById(int bookingId);
 
-    List<BookingResponse> getBookingsByCustomer(int customerId);
+    PageResponse<BookingResponse> getBookingsByCustomer(int customerId,int page, int size);
 
-    List<BookingResponse> getBookingsByDriver(int driverId);
+    PageResponse<BookingResponse> getBookingsByDriver(int driverId,int page, int size);
 
-    List<BookingResponse> getActiveBookings();
+    PageResponse<BookingResponse> getActiveBookings(int page, int size);
 
-    List<BookingResponse> getCompletedBookings();
+    PageResponse<BookingResponse> getCompletedBookings(int page, int size);
 
-    List<BookingResponse> getCancelledBookings();
+    PageResponse<BookingResponse> getCancelledBookings(int page, int size);
 
 
 }

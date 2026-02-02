@@ -3,6 +3,8 @@ package com.sajidtech.easytrip.repository;
 import com.sajidtech.easytrip.enums.Gender;
 import com.sajidtech.easytrip.enums.Status;
 import com.sajidtech.easytrip.model.Customer;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -14,16 +16,16 @@ import java.util.Optional;
 public interface CustomerRepository extends JpaRepository<Customer, Integer> {
 
 
-    List<Customer> findByGenderAndAge(Gender gender, int age);
+    Page<Customer> findByGenderAndAge(Gender gender, int age, Pageable pageable);
 
     @Query("select c from Customer c where c.age > :age")
-    List<Customer> getAllGreaterThenAge(@Param("age") int age);
+    Page<Customer> getAllGreaterThenAge(@Param("age") int age, Pageable pageable);
 
     @Query("SELECT c FROM Customer c JOIN c.booking b WHERE b.bookingId = :bookingId")
     Customer findByBookingId(@Param("bookingId") int bookingId);
 
     @Query("select c from Customer c where c.status =:status")
-    List<Customer> findByStatus(@Param("status") Status status);
+    Page<Customer> findByStatus(@Param("status") Status status, Pageable pageable);
 
     @Query("SELECT c FROM Customer c JOIN c.booking b WHERE b.bookingId = :bookingId")
     Customer findCustomerByBookingId(@Param("bookingId") int bookingId);

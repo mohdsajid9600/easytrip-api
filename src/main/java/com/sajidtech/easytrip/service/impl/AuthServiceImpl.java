@@ -12,7 +12,6 @@ import com.sajidtech.easytrip.model.User;
 import com.sajidtech.easytrip.repository.UserRepository;
 import com.sajidtech.easytrip.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AccountStatusException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -20,8 +19,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.nio.file.AccessDeniedException;
 
 @Service
 public class AuthServiceImpl implements AuthService {
@@ -57,6 +56,7 @@ public class AuthServiceImpl implements AuthService {
         return "User registered successfully";
     }
 
+    @Transactional
     public String login(LoginRequest request) {
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(()-> new UsernameNotFoundException("Invalid Email, or User not Found"));
