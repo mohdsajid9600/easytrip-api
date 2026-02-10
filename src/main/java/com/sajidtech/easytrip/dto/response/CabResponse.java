@@ -10,6 +10,7 @@ import lombok.Data;
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
+        "cabId",
         "cabNumber",
         "cabModel",
         "perKmRate",
@@ -19,10 +20,11 @@ import lombok.Data;
 })
 public class CabResponse {
 
+    private Integer cabId;
     private String cabNumber;
     private String cabModel;
     private Double perKmRate;
-    private Boolean available;
+    private Boolean isAvailable;
     private Status status;
     private DriverResponse driverResponse;
 }

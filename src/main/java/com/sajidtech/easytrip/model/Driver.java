@@ -1,13 +1,18 @@
 package com.sajidtech.easytrip.model;
 
+import com.sajidtech.easytrip.enums.Gender;
 import com.sajidtech.easytrip.enums.Status;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.id.IntegralDataTypeHolder;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -20,14 +25,22 @@ public class Driver {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int driveId;
+    private Integer driveId;
     @Column(nullable = false)
     private String name;
     @Column(nullable = false)
-    private int age;
-
+    private Byte age;
     @Column(unique = true, nullable = false)
     private String email;
+    @Column(unique = true, nullable = false)
+    private String mobileNo;
+    @Column(unique = true, nullable = false)
+    private String license;
+    @Column(nullable = false)
+    private Byte experience;
+    @Enumerated(value = EnumType.STRING)
+    @Column(nullable = false)
+    private Gender gender;
 
     @Enumerated(value = EnumType.STRING)
     private Status status;
@@ -44,4 +57,10 @@ public class Driver {
     @JoinColumn(name = "cab_id")
     private Cab cab;
 
+    @CreationTimestamp
+    @Column(updatable = false)
+    private Date createProfileAt;
+
+    @UpdateTimestamp
+    private Date lastUpdateAt;
 }

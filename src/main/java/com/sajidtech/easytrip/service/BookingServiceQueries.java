@@ -7,11 +7,11 @@ import java.util.List;
 
 public interface BookingServiceQueries {
 
-    PageResponse<BookingResponse> getAllBookings(int page, int size, String email);
+    PageResponse<BookingResponse> getAllBookings(Integer page, Integer size, String email);
 
-    PageResponse<BookingResponse> getAllCompletedBookings(int page, int size, String email);
+    PageResponse<BookingResponse> getAllCompletedBookings(Integer page, Integer size, String email);
 
-    PageResponse<BookingResponse> getAllCancelledBookings(int page, int size, String email);
+    PageResponse<BookingResponse> getAllCancelledBookings(Integer page, Integer size, String email);
 
     BookingResponse getProgressBookings(String email);
 

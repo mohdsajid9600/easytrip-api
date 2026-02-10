@@ -22,13 +22,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableArgumentResolver;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.concurrent.CyclicBarrier;
-import java.util.stream.Collectors;
 
 @Service
 public class AdminServiceImpl implements AdminService {
@@ -50,7 +47,7 @@ public class AdminServiceImpl implements AdminService {
 
 //_______________________________________________FOR CUSTOMER___________________________________________________________________________
 
-    public PageResponse<CustomerResponse> getAllCustomer(int page, int size) {
+    public PageResponse<CustomerResponse> getAllCustomer(Integer page, Integer size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<Customer> customerPage = this.customerRepository.findAll(pageable);
         List<CustomerResponse> customerResponseList = customerPage.getContent().stream()
@@ -59,30 +56,30 @@ public class AdminServiceImpl implements AdminService {
         return PageTransformer.pageToPageResponse(customerPage, customerResponseList);
     }
 
-    public CustomerResponse getCustomerById(int customerId) {
+    public CustomerResponse getCustomerById(Integer customerId) {
         Customer customer = getAndThrowCustomer(customerId);
         return CustomerTransformer.customerToCustomerResponse(customer);
     }
 
-    public PageResponse<CustomerResponse> getAllByGenderAndAge(Gender gender, int age, int page, int size) {
+    public PageResponse<CustomerResponse> getAllByGenderAndAge(Gender gender, Byte age, Integer page, Integer size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<Customer> customersPage = this.customerRepository.findByGenderAndAge(gender, age, pageable);
         List<CustomerResponse> customerResponseList = customersPage.getContent().stream()
-                .map(CustomerTransformer::customerToCustomerResponse).collect(Collectors.toList());
+                .map(CustomerTransformer::customerToCustomerResponse).toList();
 
         return PageTransformer.pageToPageResponse(customersPage, customerResponseList);
     }
 
-    public PageResponse<CustomerResponse> getAllGreaterThenAge(int age, int page, int size) {
+    public PageResponse<CustomerResponse> getAllGreaterThenAge(Byte age, Integer page, Integer size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<Customer> customersPage = this.customerRepository.getAllGreaterThenAge(age, pageable);
         List<CustomerResponse> customerResponseList = customersPage.getContent().stream()
-                .map(CustomerTransformer::customerToCustomerResponse).collect(Collectors.toList());
+                .map(CustomerTransformer::customerToCustomerResponse).toList();
 
         return PageTransformer.pageToPageResponse(customersPage, customerResponseList);
     }
 
-    public PageResponse<CustomerResponse> getActiveCustomers(int page, int size) {
+    public PageResponse<CustomerResponse> getActiveCustomers(Integer page, Integer size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<Customer> customersPage  = this.customerRepository.findByStatus(Status.ACTIVE, pageable);
         List<CustomerResponse> customerResponseList = customersPage.getContent().stream()
@@ -90,7 +87,7 @@ public class AdminServiceImpl implements AdminService {
         return PageTransformer.pageToPageResponse(customersPage, customerResponseList);
     }
 
-    public PageResponse<CustomerResponse> getInactiveCustomers(int page, int size) {
+    public PageResponse<CustomerResponse> getInactiveCustomers(Integer page, Integer size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<Customer> customersPage = this.customerRepository.findByStatus(Status.INACTIVE, pageable);
         List<CustomerResponse> customerResponseList = customersPage.getContent().stream()
@@ -99,7 +96,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Transactional
-    public CustomerResponse activeCustomer(int customerId) {
+    public CustomerResponse activeCustomer(Integer customerId) {
         Customer customer = getAndThrowCustomer(customerId);
         customer.setStatus(Status.ACTIVE);
         customer.getUser().setProfileStatus(Status.ACTIVE);
@@ -108,13 +105,13 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Transactional
-    public CustomerResponse inActiveCustomer(int customerId) {
+    public CustomerResponse inActiveCustomer(Integer customerId) {
         Customer customer = getAndThrowCustomer(customerId);
         Booking booking =  getBookingOrNullByCustomer(customer);
         if(booking != null){
             booking.setTripStatus(TripStatus.CANCELLED);
             Driver driver = this.driverRepository.findDriverByBookingId(booking.getBookingId());
-            driver.getCab().setAvailable(true);
+            driver.getCab().setIsAvailable(true);
             this.driverRepository.save(driver);
         }
         customer.setStatus(Status.INACTIVE);
@@ -126,7 +123,7 @@ public class AdminServiceImpl implements AdminService {
 
 //___________________________________________________FOR DRIVER________________________________________________________________________
 
-    public PageResponse<DriverResponse> getAllDrivers(int page, int size) {
+    public PageResponse<DriverResponse> getAllDrivers(Integer page, Integer size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<Driver> driverPage = this.driverRepository.findAll(pageable);
         List<DriverResponse> driverResponseList = driverPage.getContent().stream()
@@ -135,12 +132,12 @@ public class AdminServiceImpl implements AdminService {
         return PageTransformer.pageToPageResponse(driverPage, driverResponseList);
     }
 
-    public DriverResponse getDriverById(int driverId) {
+    public DriverResponse getDriverById(Integer driverId) {
         Driver driver = getAndThrowDriver(driverId);
         return DriverTransformer.driverToDriverResponse(driver);
     }
 
-    public PageResponse<DriverResponse> getActiveDrivers(int page, int size) {
+    public PageResponse<DriverResponse> getActiveDrivers(Integer page, Integer size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<Driver> driverPage = this.driverRepository.findByStatus(Status.ACTIVE, pageable);
         List<DriverResponse> driverResponseList = driverPage.getContent().stream()
@@ -148,7 +145,7 @@ public class AdminServiceImpl implements AdminService {
         return PageTransformer.pageToPageResponse(driverPage, driverResponseList);
     }
 
-    public PageResponse<DriverResponse> getInactiveDrivers(int page, int size) {
+    public PageResponse<DriverResponse> getInactiveDrivers(Integer page, Integer size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<Driver> driverPage = this.driverRepository.findByStatus(Status.INACTIVE, pageable);
         List<DriverResponse> driverResponseList = driverPage.getContent().stream()
@@ -157,30 +154,30 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Transactional
-    public DriverResponse activeDriver(int driverId) {
+    public DriverResponse activeDriver(Integer driverId) {
         Driver driver = getAndThrowDriver(driverId);
         driver.setStatus(Status.ACTIVE);
         driver.getUser().setProfileStatus(Status.ACTIVE);
         Cab cab = driver.getCab();
         if(cab != null){
             driver.getCab().setStatus(Status.ACTIVE);
-            driver.getCab().setAvailable(true);
+            driver.getCab().setIsAvailable(true);
         }
         Driver savedDriver = this.driverRepository.save(driver);
         return DriverTransformer.driverToDriverResponse(savedDriver);
     }
 
     @Transactional
-    public DriverResponse inActiveDriver(int driverId) {
+    public DriverResponse inActiveDriver(Integer driverId) {
         Driver driver = getAndThrowDriver(driverId);
-        Booking booking = getBookingOrNullByDriver(driver);
+        Booking booking = getActiveBookingByDriver(driver);
         if(booking != null){
             booking.setTripStatus(TripStatus.CANCELLED);
         }
         Cab cab = driver.getCab();
         if(cab != null){
             cab.setStatus(Status.INACTIVE);
-            cab.setAvailable(false);
+            cab.setIsAvailable(false);
         }
         driver.setStatus(Status.INACTIVE);
         driver.getUser().setProfileStatus(Status.INACTIVE);
@@ -191,40 +188,40 @@ public class AdminServiceImpl implements AdminService {
 
 //_________________________________________________FOR CAB________________________________________________________________________
 
-    public PageResponse<CabResponse> getAllCabs(int page, int size) {
+    public PageResponse<CabResponse> getAllCabs(Integer page, Integer size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<Cab> cabPage  = this.cabRepository.findAll(pageable);
         List<CabResponse> cabResponseList = cabPage.getContent().stream().map(this::getCabResponseByCab).toList();
         return PageTransformer.pageToPageResponse(cabPage, cabResponseList);
     }
 
-    public CabResponse getCabById(int cabId) {
+    public CabResponse getCabById(Integer cabId) {
         Cab cab = getAndThrowCab(cabId);
         return getCabResponseByCab(cab);
     }
 
-    public PageResponse<CabResponse> getActiveCabs(int page, int size) {
+    public PageResponse<CabResponse> getActiveCabs(Integer page, Integer size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<Cab> cabPage = this.cabRepository.findByStatus(Status.ACTIVE, pageable);
         List<CabResponse> cabResponseList = cabPage.getContent().stream().map(this::getCabResponseByCab).toList();
         return PageTransformer.pageToPageResponse(cabPage, cabResponseList);
     }
 
-    public PageResponse<CabResponse> getInactiveCabs(int page, int size) {
+    public PageResponse<CabResponse> getInactiveCabs(Integer page, Integer size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<Cab> cabPage = this.cabRepository.findByStatus(Status.INACTIVE, pageable);
         List<CabResponse> cabResponseList = cabPage.getContent().stream().map(this::getCabResponseByCab).toList();
         return PageTransformer.pageToPageResponse(cabPage, cabResponseList);
     }
 
-    public PageResponse<CabResponse> getAvailableCabs(int page, int size) {
+    public PageResponse<CabResponse> getAvailableCabs(Integer page, Integer size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<Cab> cabPage = this.cabRepository.getAllAvailableCab(pageable);
         List<CabResponse> cabResponseList = cabPage.getContent().stream().map(this::getCabResponseByCab).toList();
         return PageTransformer.pageToPageResponse(cabPage, cabResponseList);
     }
 
-    public PageResponse<CabResponse> getUnavailableCabs(int page, int size) {
+    public PageResponse<CabResponse> getUnavailableCabs(Integer page, Integer size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<Cab> cabPage = this.cabRepository.getUnavailableCab(pageable);
         List<CabResponse> cabResponseList = cabPage.getContent().stream().map(this::getCabResponseByCab).toList();
@@ -234,7 +231,7 @@ public class AdminServiceImpl implements AdminService {
 
 //__________________________________________________FOR BOOKING________________________________________________________________________
 
-    public PageResponse<BookingResponse> getAllBookings(int page, int size) {
+    public PageResponse<BookingResponse> getAllBookings(Integer page, Integer size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<Booking> bookingPage = this.bookingRepository.findAll(pageable);
         List<BookingResponse> bookingResponseList = bookingPage.getContent().stream()
@@ -242,32 +239,32 @@ public class AdminServiceImpl implements AdminService {
         return PageTransformer.pageToPageResponse(bookingPage, bookingResponseList);
     }
 
-    public BookingResponse getBookingById(int bookingId) {
+    public BookingResponse getBookingById(Integer bookingId) {
         Booking booking = getAndThrowBooking(bookingId);
         return getBookingResponseByBooking(booking);
     }
 
-    public PageResponse<BookingResponse> getBookingsByCustomer(int customerId,int page, int size) {
+    public PageResponse<BookingResponse> getBookingsByCustomer(Integer customerId,Integer page,Integer size) {
         Pageable pageable = PageRequest.of(page, size);
         Customer customer = getAndThrowCustomer(customerId);
-        Page<Booking> bookingPage = bookingRepository.findBookingsByCustomer(customer, pageable);
+        Page<Booking> bookingPage = this.bookingRepository.findBookingsByCustomer(customer, pageable);
         List<BookingResponse> bookingResponseList = bookingPage.getContent().stream()
                 .map(this::getBookingResponseByBooking).toList();
 
         return PageTransformer.pageToPageResponse(bookingPage, bookingResponseList);
     }
 
-    public PageResponse<BookingResponse> getBookingsByDriver(int driverId,int page, int size) {
+    public PageResponse<BookingResponse> getBookingsByDriver(Integer driverId,Integer page, Integer size) {
         Pageable pageable = PageRequest.of(page, size);
         Driver driver = getAndThrowDriver(driverId);
-        Page<Booking> bookingPage = bookingRepository.findBookingsByDriver(driver, pageable);
+        Page<Booking> bookingPage = this.bookingRepository.findBookingsByDriver(driver, pageable);
         List<BookingResponse> bookingResponseList = bookingPage.getContent().stream()
                 .map(this::getBookingResponseByBooking).toList();
 
         return PageTransformer.pageToPageResponse(bookingPage, bookingResponseList);
     }
 
-    public PageResponse<BookingResponse> getActiveBookings(int page, int size) {
+    public PageResponse<BookingResponse> getActiveBookings(Integer page, Integer size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<Booking> bookingPage = this.bookingRepository.findByTripStatus(TripStatus.IN_PROGRESS, pageable);
         List<BookingResponse> bookingResponseList = bookingPage.getContent().stream()
@@ -276,7 +273,7 @@ public class AdminServiceImpl implements AdminService {
         return PageTransformer.pageToPageResponse(bookingPage, bookingResponseList);
     }
 
-    public PageResponse<BookingResponse> getCompletedBookings(int page, int size) {
+    public PageResponse<BookingResponse> getCompletedBookings(Integer page, Integer size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<Booking> bookingPage = this.bookingRepository.findByTripStatus(TripStatus.COMPLETED, pageable);
         List<BookingResponse> bookingResponseList = bookingPage.getContent().stream()
@@ -284,7 +281,7 @@ public class AdminServiceImpl implements AdminService {
         return PageTransformer.pageToPageResponse(bookingPage, bookingResponseList);
     }
 
-    public PageResponse<BookingResponse> getCancelledBookings(int page, int size) {
+    public PageResponse<BookingResponse> getCancelledBookings(Integer page, Integer size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<Booking> bookingPage = this.bookingRepository.findByTripStatus(TripStatus.CANCELLED, pageable);
         List<BookingResponse> bookingResponseList = bookingPage.getContent().stream()
@@ -299,21 +296,21 @@ public class AdminServiceImpl implements AdminService {
         return customer.getBooking().stream().filter(b -> b.getTripStatus().equals(TripStatus.IN_PROGRESS))
                 .findFirst().orElse(null);
     }
-    private Booking getBookingOrNullByDriver(Driver driver) {
+    private Booking getActiveBookingByDriver(Driver driver) {
         return driver.getBooking().stream().filter(b -> b.getTripStatus().equals(TripStatus.IN_PROGRESS))
                 .findFirst().orElse(null);
     }
 
-    private Customer getAndThrowCustomer(int customerId) {
+    private Customer getAndThrowCustomer(Integer customerId) {
         return this.customerRepository.findById(customerId)
                 .orElseThrow(()-> new CustomerNotFoundException("Customer Id is invalid"));
     }
 
-    private Driver getAndThrowDriver(int driverId) {
+    private Driver getAndThrowDriver(Integer driverId) {
         return this.driverRepository.findById(driverId).orElseThrow(()-> new DriverNotFoundException("Driver id is Invalid"));
     }
 
-    private Cab getAndThrowCab(int cabId) {
+    private Cab getAndThrowCab(Integer cabId) {
         return this.cabRepository.findById(cabId).orElseThrow(()-> new CabNotFoundException("Cab id is Invalid"));
     }
 
@@ -328,7 +325,7 @@ public class AdminServiceImpl implements AdminService {
         return BookingTransformer.bookingToBookingResponse(b,driver.getCab(),driver, customer);
     }
 
-    private Booking getAndThrowBooking(int bookingId) {
+    private Booking getAndThrowBooking(Integer bookingId) {
         return this.bookingRepository.findById(bookingId).orElseThrow(()-> new BookingNotFoundException("Booking id is Invalid"));
     }
 }

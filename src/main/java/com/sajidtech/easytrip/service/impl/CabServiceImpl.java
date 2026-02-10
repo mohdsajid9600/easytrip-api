@@ -21,7 +21,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class CabServiceImpl implements CabService {
@@ -42,7 +41,7 @@ public class CabServiceImpl implements CabService {
         }
         Cab cab = CabTransformer.cabRequestToCab(cabRequest);
         driver.setCab(cab);
-        Driver savedDriver = driverRepository.save(driver);
+        Driver savedDriver = this.driverRepository.save(driver);
         return CabTransformer.cabToCabResponse(savedDriver.getCab(), savedDriver);
     }
 
@@ -54,17 +53,19 @@ public class CabServiceImpl implements CabService {
         if(cab == null){
             throw new CabNotFoundException("Cab not found by Driver");
         }
-
+        if(!cab.getIsAvailable()){
+            throw new RuntimeException("Cab Busy at the Moment");
+        }
         cab.setCabModel(cabRequest.getCabModel());
         cab.setCabNumber(cabRequest.getCabNumber());
         cab.setPerKmRate(cabRequest.getPerKmRate());
-        Driver savedDriver = driverRepository.save(driver);
+        Driver savedDriver = this.driverRepository.save(driver);
 
         return CabTransformer.cabToCabResponse(savedDriver.getCab(), savedDriver);
     }
 
     @Override
-    public PageResponse<CabResponse> getAllAvailableCabs(int page, int size) {
+    public PageResponse<CabResponse> getAllAvailableCabs(Integer page, Integer size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<Cab> availableCabs = this.cabRepository.getAllAvailableCab(pageable);
         List<CabResponse> cabResponses = availableCabs.stream().map(CabTransformer::cabToCabResponseForAvailable).toList();
@@ -73,7 +74,7 @@ public class CabServiceImpl implements CabService {
     }
 
     @Override
-    public CabResponse getMuCab(String email) {
+    public CabResponse getMyCab(String email) {
         Driver driver = checkExistenceOfDriver(email);
         Cab cab = driver.getCab();
         if(cab == null){

@@ -3,63 +3,62 @@ package com.sajidtech.easytrip.service;
 import com.sajidtech.easytrip.dto.response.*;
 import com.sajidtech.easytrip.enums.Gender;
 
-import java.util.List;
 
 public interface AdminService {
 
-    PageResponse<CustomerResponse> getAllCustomer(int page, int size);
+    PageResponse<CustomerResponse> getAllCustomer(Integer page, Integer size);
 
-    CustomerResponse getCustomerById(int customerId);
+    CustomerResponse getCustomerById(Integer customerId);
 
-    PageResponse<CustomerResponse> getAllByGenderAndAge(Gender gender, int age, int page, int size);
+    PageResponse<CustomerResponse> getAllByGenderAndAge(Gender gender, Byte age, Integer page, Integer size);
 
-    PageResponse<CustomerResponse> getAllGreaterThenAge(int age, int page, int size);
+    PageResponse<CustomerResponse> getAllGreaterThenAge(Byte age, Integer page, Integer size);
 
-    PageResponse<CustomerResponse> getActiveCustomers(int page, int size);
+    PageResponse<CustomerResponse> getActiveCustomers(Integer page, Integer size);
 
-    PageResponse<CustomerResponse> getInactiveCustomers(int page, int size);
+    PageResponse<CustomerResponse> getInactiveCustomers(Integer page, Integer size);
 
-    CustomerResponse activeCustomer(int customerId);
+    CustomerResponse activeCustomer(Integer customerId);
 
-    CustomerResponse inActiveCustomer(int customerId);
+    CustomerResponse inActiveCustomer(Integer customerId);
 
-    PageResponse<DriverResponse> getAllDrivers(int page, int size);
+    PageResponse<DriverResponse> getAllDrivers(Integer page, Integer size);
 
-    DriverResponse getDriverById(int driverId);
+    DriverResponse getDriverById(Integer driverId);
 
-    PageResponse<DriverResponse> getActiveDrivers(int page, int size);
+    PageResponse<DriverResponse> getActiveDrivers(Integer page, Integer size);
 
-    PageResponse<DriverResponse> getInactiveDrivers(int page, int size);
+    PageResponse<DriverResponse> getInactiveDrivers(Integer page, Integer size);
 
-    DriverResponse activeDriver(int driverId);
+    DriverResponse activeDriver(Integer driverId);
 
-    DriverResponse inActiveDriver(int driverId);
+    DriverResponse inActiveDriver(Integer driverId);
 
-    PageResponse<CabResponse> getAllCabs(int page, int size);
+    PageResponse<CabResponse> getAllCabs(Integer page, Integer size);
 
-    CabResponse getCabById(int cabId);
+    CabResponse getCabById(Integer cabId);
 
-    PageResponse<CabResponse> getActiveCabs(int page, int size);
+    PageResponse<CabResponse> getActiveCabs(Integer page, Integer size);
 
-    PageResponse<CabResponse> getInactiveCabs(int page, int size);
+    PageResponse<CabResponse> getInactiveCabs(Integer page, Integer size);
 
-    PageResponse<CabResponse> getAvailableCabs(int page, int size);
+    PageResponse<CabResponse> getAvailableCabs(Integer page, Integer size);
 
-    PageResponse<CabResponse> getUnavailableCabs(int page, int size);
+    PageResponse<CabResponse> getUnavailableCabs(Integer page, Integer size);
 
-    PageResponse<BookingResponse> getAllBookings(int page, int size);
+    PageResponse<BookingResponse> getAllBookings(Integer page, Integer size);
 
-    BookingResponse getBookingById(int bookingId);
+    BookingResponse getBookingById(Integer bookingId);
 
-    PageResponse<BookingResponse> getBookingsByCustomer(int customerId,int page, int size);
+    PageResponse<BookingResponse> getBookingsByCustomer(Integer customerId,Integer page, Integer size);
 
-    PageResponse<BookingResponse> getBookingsByDriver(int driverId,int page, int size);
+    PageResponse<BookingResponse> getBookingsByDriver(Integer driverId,Integer page, Integer size);
 
-    PageResponse<BookingResponse> getActiveBookings(int page, int size);
+    PageResponse<BookingResponse> getActiveBookings(Integer page, Integer size);
 
-    PageResponse<BookingResponse> getCompletedBookings(int page, int size);
+    PageResponse<BookingResponse> getCompletedBookings(Integer page, Integer size);
 
-    PageResponse<BookingResponse> getCancelledBookings(int page, int size);
+    PageResponse<BookingResponse> getCancelledBookings(Integer page, Integer size);
 
 
 }

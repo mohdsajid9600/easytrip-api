@@ -21,24 +21,24 @@ public class Booking {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int bookingId;
+    private Integer bookingId;
     @Column(nullable = false)
     private String pickup;
     @Column(nullable = false)
     private String destination;
     @Column(nullable = false)
-    private double tripDistanceInKm;
+    private Double tripDistanceInKm;
+    @Column(nullable = false)
+    private Double cabRateAtBooking;
+    @Column(nullable = false)
+    private Double billAmount;
 
     @Enumerated(value = EnumType.STRING)
     private TripStatus tripStatus;
 
-    @Column(nullable = false)
-    private double billAmount;
-
     @CreationTimestamp
     @Column(updatable = false)
     private Date bookedAt;
-
     @UpdateTimestamp
     private Date lastUpdateAt;
 

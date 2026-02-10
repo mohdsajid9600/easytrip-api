@@ -12,7 +12,7 @@ public class CabTransformer {
         return Cab.builder()
                 .cabModel(cabRequest.getCabModel())
                 .cabNumber(cabRequest.getCabNumber())
-                .available(true)
+                .isAvailable(true)
                 .perKmRate(cabRequest.getPerKmRate())
                 .status(Status.ACTIVE)
                 .build();
@@ -20,9 +20,10 @@ public class CabTransformer {
 
     public static CabResponse cabToCabResponse(Cab cab, Driver driver){
         return CabResponse.builder()
+                .cabId(cab.getCabId())
                 .cabNumber(cab.getCabNumber().toUpperCase())
                 .cabModel(cab.getCabModel().toUpperCase())
-                .available(cab.isAvailable())
+                .isAvailable(cab.getIsAvailable())
                 .perKmRate(cab.getPerKmRate())
                 .status(cab.getStatus())
                 .driverResponse(DriverTransformer.driverToDriverResponse(driver))
@@ -33,7 +34,7 @@ public class CabTransformer {
         return CabResponse.builder()
                 .cabNumber(cab.getCabNumber().toUpperCase())
                 .cabModel(cab.getCabModel().toUpperCase())
-                .available(cab.isAvailable())
+                .isAvailable(cab.getIsAvailable())
                 .perKmRate(cab.getPerKmRate())
                 .build();
     }
@@ -43,6 +44,7 @@ public class CabTransformer {
                 .cabNumber(cab.getCabNumber().toUpperCase())
                 .cabModel(cab.getCabModel().toUpperCase())
                 .perKmRate(cab.getPerKmRate())
+                .isAvailable(cab.getIsAvailable())
                 .status(cab.getStatus())
                 .build();
     }

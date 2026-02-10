@@ -38,6 +38,7 @@ public class CustomerEmailFormate {
                 "Cab Number     : " + booking.getCabResponse().getCabNumber() + "\n\n" +
 
                 "Driver Name    : " + booking.getCabResponse().getDriverResponse().getName() + "\n" +
+                "Driver MobileNo: " + booking.getCabResponse().getDriverResponse().getMobileNo() + "\n" +
                 "Driver Email   : " + booking.getCabResponse().getDriverResponse().getEmail() + "\n" +
                 "========================================\n\n" +
 
@@ -71,6 +72,7 @@ public class CustomerEmailFormate {
                 "Cab Number     : " + booking.getCabResponse().getCabNumber() + "\n\n" +
 
                 "Driver Name    : " + booking.getCabResponse().getDriverResponse().getName() + "\n" +
+                "Driver MobileNo: " + booking.getCabResponse().getDriverResponse().getMobileNo() + "\n" +
                 "Driver Email   : " + booking.getCabResponse().getDriverResponse().getEmail() + "\n" +
                 "========================================\n\n" +
 

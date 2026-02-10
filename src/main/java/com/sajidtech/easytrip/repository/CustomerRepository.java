@@ -16,19 +16,19 @@ import java.util.Optional;
 public interface CustomerRepository extends JpaRepository<Customer, Integer> {
 
 
-    Page<Customer> findByGenderAndAge(Gender gender, int age, Pageable pageable);
+    Page<Customer> findByGenderAndAge(Gender gender, Byte age, Pageable pageable);
 
     @Query("select c from Customer c where c.age > :age")
-    Page<Customer> getAllGreaterThenAge(@Param("age") int age, Pageable pageable);
+    Page<Customer> getAllGreaterThenAge(@Param("age") Byte age, Pageable pageable);
 
     @Query("SELECT c FROM Customer c JOIN c.booking b WHERE b.bookingId = :bookingId")
-    Customer findByBookingId(@Param("bookingId") int bookingId);
+    Customer findByBookingId(@Param("bookingId") Integer bookingId);
 
     @Query("select c from Customer c where c.status =:status")
     Page<Customer> findByStatus(@Param("status") Status status, Pageable pageable);
 
     @Query("SELECT c FROM Customer c JOIN c.booking b WHERE b.bookingId = :bookingId")
-    Customer findCustomerByBookingId(@Param("bookingId") int bookingId);
+    Customer findCustomerByBookingId(@Param("bookingId") Integer bookingId);
 
     @Query("select c from Customer c where c.email =:email")
     Optional<Customer> findByEmail(@Param("email") String email);

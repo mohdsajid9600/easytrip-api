@@ -25,7 +25,10 @@ public class CustomerController {
 
     // Register new customer
     @PostMapping("/create-profile")
-    public ResponseEntity<ApiResponse<CustomerResponse>> createProfile(@Valid @RequestBody CustomerRequest customerRequest, Principal principal){
+    public ResponseEntity<ApiResponse<CustomerResponse>> createProfile(
+            @Valid @RequestBody CustomerRequest customerRequest,
+            Principal principal
+    ){
         CustomerResponse customerResponse = this.customerService.createProfile(customerRequest, principal.getName());
         return ResponseEntity.ok(ApiResponse.success("Customer Registered", customerResponse));
     }
@@ -40,7 +43,7 @@ public class CustomerController {
     // Update customer details
     @PutMapping("/me/update")
     public ResponseEntity<ApiResponse<String>> updateCustomerInfo(@Valid @RequestBody CustomerRequest customerRequest,
-                                     Principal principal){
+                                                                  Principal principal){
         this.customerService.updateCustomerInfo(customerRequest, principal.getName());
         return ResponseEntity.ok(ApiResponse.success("Customer updated"));
     }

@@ -1,30 +1,20 @@
 package com.sajidtech.easytrip.service.impl;
 
-import com.sajidtech.easytrip.enums.Gender;
 import com.sajidtech.easytrip.enums.Status;
 import com.sajidtech.easytrip.enums.TripStatus;
 import com.sajidtech.easytrip.dto.request.CustomerRequest;
-import com.sajidtech.easytrip.dto.response.BookingResponse;
 import com.sajidtech.easytrip.dto.response.CustomerResponse;
-import com.sajidtech.easytrip.exception.BookingNotFoundException;
 import com.sajidtech.easytrip.exception.CustomerNotFoundException;
-import com.sajidtech.easytrip.model.Booking;
 import com.sajidtech.easytrip.model.Customer;
-import com.sajidtech.easytrip.model.Driver;
 import com.sajidtech.easytrip.model.User;
 import com.sajidtech.easytrip.repository.CustomerRepository;
-import com.sajidtech.easytrip.repository.DriverRepository;
 import com.sajidtech.easytrip.repository.UserRepository;
 import com.sajidtech.easytrip.service.CustomerService;
-import com.sajidtech.easytrip.transformer.BookingTransformer;
 import com.sajidtech.easytrip.transformer.CustomerTransformer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class CustomerServiceImpl implements CustomerService {
@@ -47,12 +37,12 @@ public class CustomerServiceImpl implements CustomerService {
         customer.setEmail(user.getEmail());
         customer.setUser(user);
         Customer savedCustomer = this.customerRepository.save(customer);
-        return CustomerTransformer.customerToCustomerResponse(savedCustomer);
+        return CustomerTransformer.customerToCustomerResponseSummary(savedCustomer);
     }
 
     public CustomerResponse getCustomerInfo(String email) {
         Customer customer = checkValidCustomer(email);
-        return CustomerTransformer.customerToCustomerResponse(customer);
+        return CustomerTransformer.customerToCustomerResponseSummary(customer);
     }
 
     public void updateCustomerInfo(CustomerRequest customerRequest, String email) {
@@ -60,6 +50,7 @@ public class CustomerServiceImpl implements CustomerService {
 
         customer.setName(customerRequest.getName());
         customer.setAge(customerRequest.getAge());
+        customer.setMobileNo(customerRequest.getMobileNo());
         customer.setGender(customerRequest.getGender());
 
         this.customerRepository.save(customer);
@@ -70,7 +61,7 @@ public class CustomerServiceImpl implements CustomerService {
         Customer customer = checkValidCustomer(email);
         boolean hasBooking = customer.getBooking().stream().anyMatch(b -> b.getTripStatus().equals(TripStatus.IN_PROGRESS));
         if(hasBooking){
-             throw new RuntimeException("Do complete/Cancel to the pending booking");
+            throw new RuntimeException("Do complete/Cancel to the pending booking");
         }
         customer.setStatus(Status.INACTIVE);
         customer.getUser().setProfileStatus(Status.INACTIVE);

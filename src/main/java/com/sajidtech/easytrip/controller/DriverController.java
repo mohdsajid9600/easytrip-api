@@ -39,7 +39,7 @@ public class DriverController {
     // Update driver details
     @PutMapping("/me/update")
     public ResponseEntity<ApiResponse<String>> updateProfile(@Valid @RequestBody DriverRequest driverRequest,
-                                                   Principal principal){
+                                                             Principal principal){
         this.driverService.updateProfile(driverRequest, principal.getName());
         return ResponseEntity.ok(ApiResponse.success("Driver updated"));
     }

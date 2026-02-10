@@ -10,26 +10,29 @@ import com.sajidtech.easytrip.model.Driver;
 
 public class BookingTransformer {
 
-    public static Booking bookingRequestToBooking(BookingRequest bookingRequest, double cabPerKmRate){
+    public static Booking bookingRequestToBooking(BookingRequest bookingRequest, Double cabPerKmRate){
         return Booking.builder()
-                .pickup(bookingRequest.getPickup())
-                .destination(bookingRequest.getDestination())
+                .pickup(bookingRequest.getPickup().toUpperCase())
+                .destination(bookingRequest.getDestination().toUpperCase())
                 .tripDistanceInKm(bookingRequest.getTripDistanceInKm())
                 .tripStatus(TripStatus.IN_PROGRESS)
+                .cabRateAtBooking(cabPerKmRate)
                 .billAmount(bookingRequest.getTripDistanceInKm() * cabPerKmRate)
                 .build();
     }
 
     public static BookingResponse bookingToBookingResponse(Booking booking, Cab cab, Driver driver, Customer customer){
         return BookingResponse.builder()
+                .bookingId(booking.getBookingId())
                 .pickup(booking.getPickup())
                 .destination(booking.getDestination())
                 .tripDistanceInKm(booking.getTripDistanceInKm())
+                .cabRateAtBooking(booking.getCabRateAtBooking())
                 .tripStatus(booking.getTripStatus())
                 .billAmount(booking.getBillAmount())
                 .bookedAt(booking.getBookedAt())
                 .lastUpdateAt(booking.getLastUpdateAt())
-                .customerResponse(CustomerTransformer.customerToCustomerResponse(customer))
+                .customerResponse(CustomerTransformer.customerToCustomerResponseSummary(customer))
                 .cabResponse(CabTransformer.cabToCabResponse(cab, driver))
                 .build();
     }
@@ -39,6 +42,7 @@ public class BookingTransformer {
                 .pickup(booking.getPickup())
                 .destination(booking.getDestination())
                 .tripDistanceInKm(booking.getTripDistanceInKm())
+                .cabRateAtBooking(booking.getCabRateAtBooking())
                 .tripStatus(booking.getTripStatus())
                 .billAmount(booking.getBillAmount())
                 .bookedAt(booking.getBookedAt())
@@ -52,6 +56,7 @@ public class BookingTransformer {
                 .pickup(booking.getPickup())
                 .destination(booking.getDestination())
                 .tripDistanceInKm(booking.getTripDistanceInKm())
+                .cabRateAtBooking(booking.getCabRateAtBooking())
                 .tripStatus(booking.getTripStatus())
                 .billAmount(booking.getBillAmount())
                 .bookedAt(booking.getBookedAt())

@@ -11,6 +11,7 @@ public class CustomerTransformer {
         return Customer.builder()
                 .name(customerRequest.getName())
                 .age(customerRequest.getAge())
+                .mobileNo(customerRequest.getMobileNo())
                 .gender(customerRequest.getGender())
                 .status(Status.ACTIVE)
                 .build();
@@ -18,11 +19,28 @@ public class CustomerTransformer {
 
     public static CustomerResponse customerToCustomerResponse(Customer customer){
         return CustomerResponse.builder()
+                .customerId(customer.getCustomerId())
                 .name(customer.getName())
                 .age(customer.getAge())
                 .email(customer.getEmail())
+                .mobileNo(customer.getMobileNo())
                 .gender(customer.getGender())
                 .status(customer.getStatus())
+                .createProfileAt(customer.getCreateProfileAt())
+                .lastUpdateAt(customer.getLastUpdateAt())
+                .build();
+    }
+
+    public static CustomerResponse customerToCustomerResponseSummary(Customer customer){
+        return CustomerResponse.builder()
+                .name(customer.getName())
+                .age(customer.getAge())
+                .email(customer.getEmail())
+                .mobileNo(customer.getMobileNo())
+                .gender(customer.getGender())
+                .status(customer.getStatus())
+                .createProfileAt(customer.getCreateProfileAt())
+                .lastUpdateAt(customer.getLastUpdateAt())
                 .build();
     }
 
@@ -31,6 +49,7 @@ public class CustomerTransformer {
                 .name(customer.getName())
                 .age(customer.getAge())
                 .email(customer.getEmail())
+                .mobileNo(customer.getMobileNo())
                 .gender(customer.getGender())
                 .build();
     }

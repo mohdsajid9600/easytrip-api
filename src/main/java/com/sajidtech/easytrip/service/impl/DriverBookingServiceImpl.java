@@ -40,13 +40,13 @@ public class DriverBookingServiceImpl implements DriverBookingService {
     private BookingRepository bookingRepository;
 
     @Autowired
-    private JavaMailSender javaMailSender;
+    private EmailService emailService;
 
-    public PageResponse<BookingResponse> getAllBookings(int page, int size, String email) {
+    public PageResponse<BookingResponse> getAllBookings(Integer page, Integer size, String email) {
         Pageable pageable = PageRequest.of(page, size);
         Driver driver = checkValidDriver(email);
         Page<Booking> bookingPage =
-                bookingRepository.findBookingsByDriver(driver, pageable);
+                this.bookingRepository.findBookingsByDriver(driver, pageable);
 
         List<BookingResponse> bookingResponseList = bookingPage.getContent().stream()
                 .map(booking -> getBookingResponseByBooking(booking, driver)).toList();
@@ -54,11 +54,11 @@ public class DriverBookingServiceImpl implements DriverBookingService {
         return PageTransformer.pageToPageResponse(bookingPage, bookingResponseList);
     }
 
-    public PageResponse<BookingResponse> getAllCompletedBookings(int page, int size, String email) {
+    public PageResponse<BookingResponse> getAllCompletedBookings(Integer page, Integer size, String email) {
         Pageable pageable = PageRequest.of(page, size);
         Driver driver = checkValidDriver(email);
         Page<Booking> bookingPage =
-                bookingRepository.findBookingsByDriver(driver, pageable);
+                this.bookingRepository.findBookingsByDriver(driver, pageable);
 
         List<BookingResponse> bookingResponseList = bookingPage.getContent().stream()
                 .filter(booking-> booking.getTripStatus().equals(TripStatus.COMPLETED))
@@ -67,11 +67,11 @@ public class DriverBookingServiceImpl implements DriverBookingService {
         return PageTransformer.pageToPageResponse(bookingPage, bookingResponseList);
     }
 
-    public PageResponse<BookingResponse> getAllCancelledBookings(int page, int size, String email) {
+    public PageResponse<BookingResponse> getAllCancelledBookings(Integer page, Integer size, String email) {
         Pageable pageable = PageRequest.of(page, size);
         Driver driver = checkValidDriver(email);
         Page<Booking> bookingPage =
-                bookingRepository.findBookingsByDriver(driver, pageable);
+                this.bookingRepository.findBookingsByDriver(driver, pageable);
 
         List<BookingResponse> bookingResponseList = bookingPage.getContent().stream()
                 .filter(booking-> booking.getTripStatus().equals(TripStatus.CANCELLED))
@@ -84,7 +84,7 @@ public class DriverBookingServiceImpl implements DriverBookingService {
         Driver driver = checkValidDriver(email);
         Booking progressBooking = driver.getBooking().stream()
                 .filter(booking-> booking.getTripStatus().equals(TripStatus.IN_PROGRESS)).findFirst()
-                .orElseThrow(()-> new BookingNotFoundException("Driver has no one Booking who is IN_PROGRESS"));
+                .orElseThrow(()-> new BookingNotFoundException("Driver has no one Active Ride"));
         return getBookingResponseByBooking(progressBooking, driver);
     }
 
@@ -95,11 +95,11 @@ public class DriverBookingServiceImpl implements DriverBookingService {
         Customer customer = this.customerRepository.findCustomerByBookingId(booking.getBookingId());
 
         booking.setTripStatus(TripStatus.COMPLETED);
-        driver.getCab().setAvailable(true);
+        driver.getCab().setIsAvailable(true);
         this.driverRepository.save(driver);
-        BookingResponse bookingResponse = BookingTransformer.bookingToBookingResponse(booking,driver.getCab(),driver,customer);
+        BookingResponse bookingResponse = BookingTransformer.bookingToBookingResponseForDriver(booking,driver.getCab(),customer);
         //  EmailSender to the customer who ever booked the cab
-//        EmailService.sendEmailToCustomer(CustomerEmailFormate.getSubject(TripStatus.COMPLETED), bookingResponse, TripStatus.COMPLETED);
+//        emailService.sendEmailToCustomer(CustomerEmailFormate.getSubject(TripStatus.COMPLETED), bookingResponse, TripStatus.COMPLETED);
     }
 
     private Booking driverGetActiveBooking(Driver driver) {
@@ -108,7 +108,7 @@ public class DriverBookingServiceImpl implements DriverBookingService {
     }
 
     private Driver checkValidDriver(String email) {
-        Driver driver = driverRepository.findByEmail(email).orElseThrow(()-> new DriverNotFoundException("Driver Not Found"));
+        Driver driver = this.driverRepository.findByEmail(email).orElseThrow(()-> new DriverNotFoundException("Driver Not Found"));
         if(driver.getStatus() == Status.INACTIVE){
             throw new RuntimeException("Driver is Inactive, Access denied ");
         }
@@ -116,7 +116,7 @@ public class DriverBookingServiceImpl implements DriverBookingService {
     }
 
     private BookingResponse getBookingResponseByBooking(Booking booking, Driver driver) {
-        Customer customer = customerRepository.findByBookingId(booking.getBookingId());
+        Customer customer = this.customerRepository.findByBookingId(booking.getBookingId());
         return BookingTransformer.bookingToBookingResponseForDriver(booking, driver.getCab(),customer);
     }
 

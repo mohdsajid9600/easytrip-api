@@ -3,6 +3,7 @@ package com.sajidtech.easytrip.service.impl;
 import com.sajidtech.easytrip.dto.request.ChangePasswordRequest;
 import com.sajidtech.easytrip.dto.request.LoginRequest;
 import com.sajidtech.easytrip.dto.request.SignupRequest;
+import com.sajidtech.easytrip.dto.response.UserResponse;
 import com.sajidtech.easytrip.enums.Role;
 import com.sajidtech.easytrip.enums.Status;
 import com.sajidtech.easytrip.exception.InvalidOldPasswordException;
@@ -19,8 +20,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.security.web.context.SecurityContextRepository;
+import org.springframework.security.core.context.SecurityContext;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.transaction.annotation.Transactional;
-
 
 @Service
 public class AuthServiceImpl implements AuthService {
@@ -33,6 +37,9 @@ public class AuthServiceImpl implements AuthService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private SecurityContextRepository securityContextRepository;
 
     public String register(SignupRequest request) {
 
@@ -57,23 +64,24 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Transactional
-    public String login(LoginRequest request) {
+    public String login(LoginRequest request, HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
         User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(()-> new UsernameNotFoundException("Invalid Email, or User not Found"));
+                .orElseThrow(() -> new UsernameNotFoundException("Invalid Email, or User not Found"));
 
-        if(user.getProfileStatus().equals(Status.INACTIVE)){
+        if (user.getProfileStatus().equals(Status.INACTIVE)) {
             throw new RuntimeException("Account is Inactive");
         }
 
-        UsernamePasswordAuthenticationToken token =
-                new UsernamePasswordAuthenticationToken(
-                        request.getEmail(),
-                        request.getPassword()
-                );
+        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
+                request.getEmail(),
+                request.getPassword());
 
         Authentication authentication = authenticationManager.authenticate(token); // real login
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+        SecurityContext context = SecurityContextHolder.createEmptyContext();
+        context.setAuthentication(authentication);
+        SecurityContextHolder.setContext(context);
+        securityContextRepository.saveContext(context, httpRequest, httpResponse);
 
         return "Login successful";
     }
@@ -98,5 +106,12 @@ public class AuthServiceImpl implements AuthService {
         this.userRepository.save(user);
     }
 
-}
+    public UserResponse getCurrentUser(String email) {
+        User user = this.userRepository.findByEmail(email).orElseThrow(()-> new UserNotFoundException("Invalid credentials"));
+        return UserResponse.builder().email(user.getEmail())
+                .role(user.getRole())
+                .profileStatus(user.getProfileStatus())
+                .build();
+    }
 
+}

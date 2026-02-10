@@ -18,15 +18,15 @@ public class Cab {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int cabId;
+    private Integer cabId;
 
     @Column(unique = true, nullable = false)
     private String cabNumber;
     @Column(nullable = false)
     private String cabModel;
     @Column(nullable = false)
-    private double perKmRate;
-    private boolean available;
+    private Double perKmRate;
+    private Boolean isAvailable;
     @Enumerated(value = EnumType.STRING)
     private Status status;
 

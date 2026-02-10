@@ -12,17 +12,27 @@ public class DriverTransformer {
         return Driver.builder()
                 .name(driverRequest.getName())
                 .age(driverRequest.getAge())
+                .mobileNo(driverRequest.getMobileNo())
+                .license(driverRequest.getLicense())
+                .experience(driverRequest.getExperience())
+                .gender(driverRequest.getGender())
                 .status(Status.ACTIVE)
                 .build();
     }
 
     public static DriverResponse driverToDriverResponse(Driver driver){
         return DriverResponse.builder()
+                .driverId(driver.getDriveId())
                 .name(driver.getName().toUpperCase())
                 .age(driver.getAge())
                 .email(driver.getEmail())
-                .driverId(driver.getDriveId())
+                .mobileNo(driver.getMobileNo())
+                .license(driver.getLicense())
+                .experience(driver.getExperience())
+                .gender(driver.getGender())
                 .status(driver.getStatus())
+                .createProfileAt(driver.getCreateProfileAt())
+                .lastUpdateAt(driver.getLastUpdateAt())
                 .build();
     }
 
@@ -31,6 +41,8 @@ public class DriverTransformer {
                 .name(driver.getName().toUpperCase())
                 .age(driver.getAge())
                 .email(driver.getEmail())
+                .mobileNo(driver.getMobileNo())
+                .gender(driver.getGender())
                 .build();
     }
 }

@@ -11,7 +11,7 @@ public interface CabService {
 
     CabResponse updateCabByDriver(CabRequest cabRequest, String email);
 
-    PageResponse<CabResponse> getAllAvailableCabs(int page, int size);
+    PageResponse<CabResponse> getAllAvailableCabs(Integer page, Integer size);
 
-    CabResponse getMuCab(String email);
+    CabResponse getMyCab(String email);
 }

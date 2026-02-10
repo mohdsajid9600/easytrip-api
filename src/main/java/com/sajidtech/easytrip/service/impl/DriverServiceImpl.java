@@ -49,7 +49,10 @@ public class DriverServiceImpl implements DriverService {
 
         driver.setName(driverRequest.getName());
         driver.setAge(driverRequest.getAge());
-
+        driver.setMobileNo(driverRequest.getMobileNo());
+        driver.setLicense(driverRequest.getLicense());
+        driver.setExperience(driverRequest.getExperience());
+        driver.setGender(driverRequest.getGender());
         this.driverRepository.save(driver);
     }
 
@@ -63,7 +66,7 @@ public class DriverServiceImpl implements DriverService {
         }
         Cab cab = driver.getCab();
         if(cab != null){
-            cab.setAvailable(false);
+            cab.setIsAvailable(false);
             cab.setStatus(Status.INACTIVE);
         }
         driver.setStatus(Status.INACTIVE);

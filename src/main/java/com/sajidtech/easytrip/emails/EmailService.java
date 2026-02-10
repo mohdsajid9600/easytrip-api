@@ -12,10 +12,10 @@ import org.springframework.stereotype.Service;
 public class EmailService {
 
     @Autowired
-    private static JavaMailSender mailSender;
+    private JavaMailSender mailSender;
 
     @Async("taskExecutor")
-    public static void sendEmail(String to, String subject, String body) {
+    public void sendEmail(String to, String subject, String body) {
 
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(to);
@@ -26,7 +26,7 @@ public class EmailService {
     }
 
     @Async("taskExecutor")
-    public static void sendEmailToCustomer(String subject, BookingResponse bookingResponse, TripStatus tripStatus){
+    public void sendEmailToCustomer(String subject, BookingResponse bookingResponse, TripStatus tripStatus){
         String body = CustomerEmailFormate.getEmailTemplate(
                 tripStatus,
                 bookingResponse

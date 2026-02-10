@@ -8,7 +8,7 @@ import java.util.List;
 public class PageTransformer {
 
     public static <T, R> PageResponse<R> pageToPageResponse(Page<T> pageData, List<R> content){
-       return PageResponse.<R>builder()
+        return PageResponse.<R>builder()
                 .content(content)
                 .pageNumber(pageData.getNumber())
                 .pageSize(pageData.getSize())
