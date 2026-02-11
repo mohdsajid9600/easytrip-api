@@ -67,7 +67,7 @@ public class CabServiceImpl implements CabService {
     @Override
     public PageResponse<CabResponse> getAllAvailableCabs(Integer page, Integer size) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<Cab> availableCabs = this.cabRepository.getAllAvailableCab(pageable);
+        Page<Cab> availableCabs = this.cabRepository.findAvailableCabs(pageable);
         List<CabResponse> cabResponses = availableCabs.stream().map(CabTransformer::cabToCabResponseForAvailable).toList();
 
         return PageTransformer.pageToPageResponse(availableCabs, cabResponses);

@@ -216,7 +216,7 @@ public class AdminServiceImpl implements AdminService {
 
     public PageResponse<CabResponse> getAvailableCabs(Integer page, Integer size) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<Cab> cabPage = this.cabRepository.getAllAvailableCab(pageable);
+        Page<Cab> cabPage = this.cabRepository.findAvailableCabs(pageable);
         List<CabResponse> cabResponseList = cabPage.getContent().stream().map(this::getCabResponseByCab).toList();
         return PageTransformer.pageToPageResponse(cabPage, cabResponseList);
     }

@@ -30,6 +30,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.Random;
 
 @Service
 public class CustomerBookingServiceImpl implements CustomerBookingService {
@@ -107,8 +109,10 @@ public class CustomerBookingServiceImpl implements CustomerBookingService {
             throw new RuntimeException("Pls complete or cancel Active ride first");
         }
 
-        Cab availableCab  = this.cabRepository.getAvailableCab().orElseThrow(()->
-                new CabUnavailableException("Cab unavailable at this time"));
+        if(getAvailableCab().isEmpty()) {
+            throw new CabUnavailableException("Cab unavailable at this time");
+        }
+        Cab availableCab  = getAvailableCab().get();
 
         Driver driver  = this.driverRepository.availableCabDriver(availableCab.getCabId());
         Booking booking = BookingTransformer.bookingRequestToBooking(bookingRequest, availableCab.getPerKmRate());
@@ -174,4 +178,16 @@ public class CustomerBookingServiceImpl implements CustomerBookingService {
         Driver driver = this.driverRepository.findDriverByBookingId(booking.getBookingId());
         return BookingTransformer.bookingToBookingResponseForCustomer(booking, driver.getCab(), driver);
     }
+
+    private Optional<Cab> getAvailableCab() {
+        long count = this.cabRepository.count();
+
+        if (count == 0) return Optional.empty();
+
+        int index = new Random().nextInt((int) count);
+
+        Page<Cab> page = this.cabRepository.findAvailableCabs(PageRequest.of(index, 1));
+        return page.getContent().stream().findFirst();
+    }
+
 }

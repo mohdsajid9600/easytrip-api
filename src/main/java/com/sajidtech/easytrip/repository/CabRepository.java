@@ -17,11 +17,11 @@ import java.util.Optional;
 @Repository
 public interface CabRepository extends JpaRepository<Cab, Integer> {
 
-    @Query("select c from Cab c where c.isAvailable = true and c.status = com.sajidtech.easytrip.enums.Status.ACTIVE order by rand() limit 1")
-    Optional<Cab> getAvailableCab();
+//    @Query("select c from Cab c where c.isAvailable = true and c.status = com.sajidtech.easytrip.enums.Status.ACTIVE order by rand() limit 1")
+//    Optional<Cab> getAvailableCab();
 
-    @Query("select c from Cab c where c.isAvailable = true")
-    Page<Cab> getAllAvailableCab(Pageable pageable);
+    @Query("select c from Cab c where c.isAvailable = true and c.status = com.sajidtech.easytrip.enums.Status.ACTIVE")
+    Page<Cab> findAvailableCabs(Pageable pageable);
 
     @Query("SELECT d FROM Driver d JOIN d.cab c WHERE c.cabId = :cabId")
     Driver getDriverByCabId(@Param("cabId") Integer cabId);
