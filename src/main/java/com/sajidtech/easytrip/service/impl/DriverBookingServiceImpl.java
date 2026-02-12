@@ -99,7 +99,11 @@ public class DriverBookingServiceImpl implements DriverBookingService {
         this.driverRepository.save(driver);
         BookingResponse bookingResponse = BookingTransformer.bookingToBookingResponseForDriver(booking,driver.getCab(),customer);
         //  EmailSender to the customer who ever booked the cab
-//        emailService.sendEmailToCustomer(CustomerEmailFormate.getSubject(TripStatus.COMPLETED), bookingResponse, TripStatus.COMPLETED);
+        emailService.sendEmailToCustomer(CustomerEmailFormate.getSubject(
+                TripStatus.COMPLETED),
+                bookingResponse,
+                TripStatus.COMPLETED
+        );
     }
 
     private Booking driverGetActiveBooking(Driver driver) {

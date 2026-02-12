@@ -23,6 +23,9 @@ public interface CabRepository extends JpaRepository<Cab, Integer> {
     @Query("select c from Cab c where c.isAvailable = true and c.status = com.sajidtech.easytrip.enums.Status.ACTIVE")
     Page<Cab> findAvailableCabs(Pageable pageable);
 
+    @Query("select count(c) from Cab c where c.isAvailable = true and c.status = com.sajidtech.easytrip.enums.Status.ACTIVE")
+    long countAvailableCabs();
+
     @Query("SELECT d FROM Driver d JOIN d.cab c WHERE c.cabId = :cabId")
     Driver getDriverByCabId(@Param("cabId") Integer cabId);
 

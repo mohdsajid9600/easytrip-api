@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Value;
+
 
 @Component
 public class AdminDataLoader implements CommandLineRunner {
@@ -18,13 +20,23 @@ public class AdminDataLoader implements CommandLineRunner {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Value("${admin.email}")
+    private String adminEmail;
+
+    @Value("${admin.password}")
+    private String adminPassword;
+
+
     @Override
     public void run(String... args) {
 
-        if (!userRepository.existsByEmail("admin@gmail.com")) {
+        if(userRepository.existsByEmail("admin@gmail.com")){
+            userRepository.deleteByEmail("admin@gmail.com");
+        }
+        if (!userRepository.existsByEmail(adminEmail)) {
             User admin = new User();
-            admin.setEmail("admin@gmail.com");
-            admin.setPassword(passwordEncoder.encode("admin123"));
+            admin.setEmail(adminEmail);
+            admin.setPassword(passwordEncoder.encode(adminPassword));
             admin.setRole(Role.ADMIN);
             admin.setProfileStatus(Status.ACTIVE);
 

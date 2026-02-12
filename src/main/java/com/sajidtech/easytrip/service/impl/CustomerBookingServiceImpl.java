@@ -102,32 +102,46 @@ public class CustomerBookingServiceImpl implements CustomerBookingService {
 
     @Transactional
     public BookingResponse bookCab(BookingRequest bookingRequest, String email) {
+
         Customer customer = checkValidCustomer(email);
 
-        boolean hasOldBooking = customer.getBooking().stream().anyMatch(b-> b.getTripStatus().equals((TripStatus.IN_PROGRESS)));
-        if(hasOldBooking){
+        boolean hasOldBooking = customer.getBooking().stream()
+                .anyMatch(b -> b.getTripStatus().equals(TripStatus.IN_PROGRESS));
+
+        if (hasOldBooking) {
             throw new RuntimeException("Pls complete or cancel Active ride first");
         }
 
-        if(getAvailableCab().isEmpty()) {
-            throw new CabUnavailableException("Cab unavailable at this time");
-        }
-        Cab availableCab  = getAvailableCab().get();
+        Cab availableCab = getAvailableCab();   // cab already reserved here
+        Driver driver = this.driverRepository.availableCabDriver(availableCab.getCabId());
 
-        Driver driver  = this.driverRepository.availableCabDriver(availableCab.getCabId());
-        Booking booking = BookingTransformer.bookingRequestToBooking(bookingRequest, availableCab.getPerKmRate());
+        Booking booking =
+                BookingTransformer.bookingRequestToBooking(
+                        bookingRequest,
+                        availableCab.getPerKmRate()
+                );
+
         Booking savedBooking = this.bookingRepository.save(booking);
 
-        availableCab.setIsAvailable(false);
         driver.getBooking().add(savedBooking);
         customer.getBooking().add(savedBooking);
 
         Customer savedCustomer = this.customerRepository.save(customer);
         Driver savedDriver = this.driverRepository.save(driver);
 
-        BookingResponse bookingResponse = BookingTransformer.bookingToBookingResponse(savedBooking,availableCab,savedDriver, savedCustomer);
-        // EmailSender to the customer who ever booked the cab
-//        emailService.sendEmailToCustomer(CustomerEmailFormate.getSubject(TripStatus.IN_PROGRESS), bookingResponse, TripStatus.IN_PROGRESS);
+        BookingResponse bookingResponse =
+                BookingTransformer.bookingToBookingResponse(
+                        savedBooking,
+                        availableCab,
+                        savedDriver,
+                        savedCustomer
+                );
+
+        emailService.sendEmailToCustomer(
+                CustomerEmailFormate.getSubject(TripStatus.IN_PROGRESS),
+                bookingResponse,
+                TripStatus.IN_PROGRESS
+        );
 
         return bookingResponse;
     }
@@ -157,7 +171,11 @@ public class CustomerBookingServiceImpl implements CustomerBookingService {
         this.driverRepository.save(driver);
         BookingResponse bookingResponse = BookingTransformer.bookingToBookingResponse(booking,driver.getCab(),driver, customer);
         //  EmailSender to the customer who ever cancel the cab
-//        emailService.sendEmailToCustomer(CustomerEmailFormate.getSubject(TripStatus.CANCELLED), bookingResponse, TripStatus.CANCELLED);
+        emailService.sendEmailToCustomer(
+                CustomerEmailFormate.getSubject(TripStatus.CANCELLED),
+                bookingResponse,
+                TripStatus.CANCELLED
+        );
     }
 
     private Booking getProgressBookingByCustomer(Customer customer) {
@@ -179,15 +197,31 @@ public class CustomerBookingServiceImpl implements CustomerBookingService {
         return BookingTransformer.bookingToBookingResponseForCustomer(booking, driver.getCab(), driver);
     }
 
-    private Optional<Cab> getAvailableCab() {
-        long count = this.cabRepository.count();
+    private Cab getAvailableCab() {
 
-        if (count == 0) return Optional.empty();
+        long count = this.cabRepository.countAvailableCabs();
 
-        int index = new Random().nextInt((int) count);
+        if (count == 0) {
+            throw new CabUnavailableException("Cab unavailable at this time");
+        }
 
-        Page<Cab> page = this.cabRepository.findAvailableCabs(PageRequest.of(index, 1));
-        return page.getContent().stream().findFirst();
+        int index = java.util.concurrent.ThreadLocalRandom
+                .current()
+                .nextInt((int) count);
+
+        Page<Cab> page =
+                this.cabRepository.findAvailableCabs(PageRequest.of(index, 1));
+
+        if (page.isEmpty()) {
+            throw new CabUnavailableException("Cab unavailable at this time");
+        }
+
+        Cab cab = page.getContent().get(0);
+
+        // reserve cab immediately inside transaction
+        cab.setIsAvailable(false);
+
+        return cab;
     }
 
 }
