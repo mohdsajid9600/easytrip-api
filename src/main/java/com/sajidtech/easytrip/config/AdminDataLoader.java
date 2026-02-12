@@ -9,7 +9,6 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.transaction.annotation.Transactional;
 
 
 @Component
@@ -29,19 +28,16 @@ public class AdminDataLoader implements CommandLineRunner {
 
 
     @Override
-    @Transactional
     public void run(String... args) {
 
-        userRepository.deleteByEmail("admin@gmail.com");
-
-        if (!userRepository.existsByEmail(adminEmail)) {
+        if (!this.userRepository.existsByEmail(adminEmail)) {
             User admin = new User();
             admin.setEmail(adminEmail);
             admin.setPassword(passwordEncoder.encode(adminPassword));
             admin.setRole(Role.ADMIN);
             admin.setProfileStatus(Status.ACTIVE);
 
-            userRepository.save(admin);
+            this.userRepository.save(admin);
         }
     }
 
