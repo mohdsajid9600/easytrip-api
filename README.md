@@ -5,11 +5,84 @@ It provides APIs to manage authentication, customers, drivers, cabs, and booking
 
 ## 🔍 About Project
 
-EasyTrip is a secure and scalable backend RESTful web application developed using Spring Boot for managing a complete cab booking system. The application is designed around dedicated dashboards for Customer, Driver, and Admin, with strict authentication and role-based authorization applied across all APIs. Customers can manage their profiles and book cabs, drivers can handle trip execution and booking status updates, and administrators can monitor and control customers, drivers, cabs, and bookings efficiently. All user operations are protected through ownership-based access control, ensuring that each user can access only their own data and related bookings.
+EasyTrip is a secure, **role-based cab booking backend application** developed using **Spring Boot** to manage customers, drivers, cabs, and bookings through RESTful APIs. The system supports the **complete booking lifecycle**, including cab booking, cancellation, trip completion, and automated **email notifications** based on booking status.
 
-The project follows a clean layered architecture using Controller, Service, Repository, DTO, and Transformer layers to ensure maintainability, scalability, and readability. Centralized exception handling provides consistent and structured error responses. Swagger UI is integrated for interactive API documentation and testing. The system also implements essential security features such as password encryption (BCrypt), login/logout mechanisms, change password and forgot password flows, along with status-based entity management (ACTIVE, INACTIVE, CONFIRMATION, COMPLETED, CANCELLED, etc.), reflecting real-world cab booking workflows.
+The application implements **authentication and role-based authorization (ADMIN, DRIVER, CUSTOMER)** using **Spring Security,** along with **ownership-based access control** to ensure users can access only their own profiles and bookings through secure /me APIs. An **Admin module** is designed to manage customers, drivers, cabs, and bookings with **status-based filtering and search functionality.**
+
+The project follows a **clean layered architecture (Controller–Service–Repository–DTO)** with **validation, global exception handling, pagination, and filtering APIs** for scalable backend design. APIs are documented and tested using **Swagger UI**.
+
+The backend is deployed on **Render** and integrated with a frontend application generated using **Antigravity AI**, which is deployed on **Vercel**.
+
+**Backend Live URL:**
+https://easytrip-api-kaeq.onrender.com
+
+**Frontend Live URL:**
+https://easytrip-app.vercel.app
 
 **This project is suitable for demonstrating real-world backend development concepts such as:**
+
+### ✔ Production-Level Enhancements
+
+The backend has been enhanced with several industry-level practices:
+
+- Deployment on Render cloud platform  
+- Integration with a live frontend (Vercel)  
+- CORS configuration for cross-origin frontend communication  
+- PostgreSQL production database support  
+- Docker support for deployment  
+- Asynchronous email sending  
+- Environment-based configuration  
+- Clean service abstraction  
+- Structured API responses  
+- Enum-based status management  
+- Principal-based ownership security  
+- Centralized validation and exception handling  
+
+### ✔ Backend Architecture
+
+The project follows a clean layered architecture:
+
+Controller → Service → Repository → Database
+
+**Additional layers:**
+
+- DTO layer  
+- Transformer layer  
+- Security layer  
+- Email module  
+- Exception module  
+- Configuration module
+  
+This ensures maintainability, scalability, and separation of concerns.
+
+### ✔ Security Model
+
+The application uses Spring Security with session-based authentication.
+
+**Security features include:**
+
+- Role-based authorization (ADMIN, DRIVER, CUSTOMER)  
+- Ownership-based access control  
+- BCrypt password encryption  
+- Login / Logout  
+- Change password flow  
+- Profile status validation  
+- Principal-based data access  
+- Protected REST endpoints  
+
+Ownership security ensures users can access only their own data using /me APIs.
+
+### ✔ 📧 Email Notification System
+
+The system sends automated emails to customers for:
+
+- Booking Confirmation  
+- Booking Completion  
+- Booking Cancellation  
+
+Emails are generated dynamically using booking data.
+
+Email sending is implemented using JavaMailSender and asynchronous execution.
 
 ### ✔ ⚙️ Technical Features
 
@@ -20,24 +93,13 @@ The project follows a clean layered architecture using Controller, Service, Repo
 - Role based authorization (Admin, Driver, Customer)  
 - Ownership security (user can access only his own data)
 - Validation annotations
+- Pagination & Sorting
 - Service layer separation
 - Interface-based services  
 - Global exception handling
 - Status-based filtering using Enums
 - Clean layered architecture (Controller, Service, Repository, Model)
-- Swagger UI for API documentation
-
-### 📧 Email Notification System
-
-The application sends email notifications to customers for:
-
-- Booking Confirmation
-
-- Booking Completion
-
-- Booking Cancellation
-
-Email templates are generated dynamically based on booking status.   
+- Swagger UI for API documentation  
 
 
 ## 🛡️ Security Model (Role Security Rules)
@@ -176,15 +238,28 @@ This ensures:
 - **RESTful APIs**
 - **Maven**
 - **Lombok**
-- **Postman / Swagger (for testing)**  
+- **Postman / Swagger (for testing)**
+
+## Deployment:
+
+- Render (Backend hosting)  
+- Docker  
+
+## Frontend Integration:
+
+- Antigravity AI generated frontend  
+- Vercel deployment  
+- CORS enabled backend APIs  
+
+## Testing & Documentation:
+
+- Postman  
+- Swagger UI  
 
 ## 📂 Project Structure
 
 ```
 easetrip
-│
-├── .idea
-├── .mvn
 │
 ├── src
 │   ├── main
@@ -202,27 +277,32 @@ easetrip
 │   │   │       ├── service
 │   │   │       ├── transformer
 │   │   │       └── EasytripApplication.java
-│   │   │
 │   │   └── resources
 │   │       ├── static
 │   │       ├── templates
-│   │       └── application.properties
-│   │
+│   │       ├── application.properties
+│   │       ├── application-dev.properties
+│   │       └── application-prod.properties
 │   └── test
-│
 ├── target
-│
 ├── .gitattributes
 ├── .gitignore
+├── Dockerfile
 ├── HELP.md
 ├── mvnw
 ├── mvnw.cmd
 └── pom.xml
 ```````
+# Application Configuration (application.properties)
 
-## 🗄 Database Configuration
+The project supports multiple environment configurations for local development and production deployment.
 
-Configure database in  ```application.properties```:
+You can configure them inside `application.properties` or using environment variables.
+
+---
+
+## 1. Local Development Configuration (MySQL)
+
 ```
 spring.datasource.url=jdbc:mysql://localhost:3306/easytrip_db
 spring.datasource.username=root
@@ -230,17 +310,84 @@ spring.datasource.password=your_password
 
 spring.jpa.hibernate.ddl-auto=update
 spring.jpa.show-sql=true
+spring.jpa.database-platform=org.hibernate.dialect.MySQL8Dialect
+```
 
+Steps to run locally:
+
+1. Install MySQL
+2. Create database:
+
+```
+create database easytrip_db;
+```
+
+3. Update username and password
+4. Run Spring Boot application
+
+---
+
+## 2. Production Database Configuration (PostgreSQL — Render)
+
+Render provides PostgreSQL database credentials via environment variables.
+
+Example configuration:
+
+```
+spring.datasource.url=${DB_URL}
+spring.datasource.username=${DB_USERNAME}
+spring.datasource.password=${DB_PASSWORD}
+
+spring.jpa.database-platform=org.hibernate.dialect.PostgreSQLDialect
+spring.jpa.hibernate.ddl-auto=update
+```
+
+Render Environment Variables:
+
+```
+DB_URL=jdbc:postgresql://host:5432/db_name
+DB_USERNAME=your_username
+DB_PASSWORD=your_password
+```
+
+Steps on Render:
+
+1. Create PostgreSQL database
+2. Copy database credentials
+3. Add Environment Variables in Render service
+4. Redeploy backend service
+
+---
+
+## 3. Email Configuration (SMTP)
+
+Email notifications are sent using Gmail SMTP.
+
+```
 spring.mail.host=smtp.gmail.com
 spring.mail.port=587
 spring.mail.username=your_email@gmail.com
 spring.mail.password=your_app_password
 spring.mail.properties.mail.smtp.auth=true
 spring.mail.properties.mail.smtp.starttls.enable=true
-
 ```
 
-## ⚙ How to Run the Project
+Steps:
+
+1. Enable 2-Step Verification in Gmail
+2. Generate App Password
+3. Use App Password in configuration
+4. Restart application
+
+---
+
+## Notes
+
+For production deployment, sensitive credentials should always be stored in environment variables instead of hardcoding them in `application.properties`.
+
+This project is already configured to support environment-based configuration when deployed on Render.
+
+## ⚙ How to Run the Project locally
 
  **1️. Clone repository**
 ```  git clone https://github.com/mohdsajid9600/easetrip-app.git  ```
@@ -397,17 +544,14 @@ Use Postman or Swagger UI to test APIs.
 
 ## 📈 Future Enhancements
 
-**✔ JWT Authentication**
+✔ JWT authentication  
+✔ Payment gateway integration  
+✔ Ride tracking  
+✔ Rating system  
+✔ API rate limiting  
+✔ Logging & monitoring  
+✔ CI/CD pipeline  
 
-**✔ Swagger Documentation**  
-
-**✔ Ride Tracking**
-
-**✔ Rating System**  
-
-**✔ Payment Gateway Integration**
-
-**✔ Frontend (React)**
 
 ## 👨‍💻 Developer
 
